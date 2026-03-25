@@ -1,0 +1,26 @@
+# Bloom Finance - EditorConfig
+# Maintains consistent coding styles across different editors and IDEs
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# HTML, CSS, JavaScript
+[*.{html,css,js,json}]
+indent_size = 2
+indent_style = space
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 100
+
+# YAML
+[*.{yml,yaml}]
+indent_size = 2
+indent_style = space

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bloom — Privacy Mode | 100% Local Finance Tracker</title>
+  <meta name="description" content="Bloom Privacy Mode — 100% private financial tracking. All data stored locally on your device. No cloud sync, no tracking, complete privacy.">
+  <meta name="keywords" content="privacy-first finance, local finance tracker, private budget, offline finance tool, data privacy, secure money management">
+  <meta name="author" content="Bloom Digital Conservatory">
+  <meta name="theme-color" content="#4d7a52">
+  
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bloom.finance/privacy-mode">
+  <meta property="og:title" content="Bloom — Privacy Mode | 100% Local Finance Tracker">
+  <meta property="og:description" content="100% private financial tracking. All data stored locally on your device. No cloud sync, no tracking.">
+  <meta property="og:image" content="assets/images/logo.png">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bloom — Privacy Mode">
+  <meta name="twitter:description" content="100% private financial tracking with local data storage.">
+  <meta name="twitter:image" content="assets/images/logo.png">
+  
+  <!-- Security Headers -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+</head>
+
+<body>
+
+  <script>
+    // Apply theme immediately to prevent flash
+    (function() {
+      const theme = localStorage.getItem('bloom_theme') || 'system';
+      const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) {
+        document.documentElement.classList.add('dark-mode');
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.classList.add('light-mode');
+        document.documentElement.style.colorScheme = 'light';
+      }
+    })();
+    
+    // Check if actually in privacy mode
+    if (localStorage.getItem('bloom_privacy_mode') !== 'true') {
+      window.location.href = 'finance-tool.html';
+    }
+  </script>
+
+  <!-- GLOBAL INITIAL LOADER -->
+  <div id="globalLoader" class="global-loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Loading Bloom...</div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="#4d7a52" />
+            <path d="M12 6c0 3.5-2.5 6-6 6 3.5 0 6 2.5 6 6 0-3.5 2.5-6 6-6-3.5 0-6-2.5-6-6z" fill="#a8c5ac" />
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">Bloom</span>
+          <span class="logo-sub">PRIVATE MODE</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-section="transactions" onclick="switchSection('transactions', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+          </svg>
+          <span>Transactions</span>
+        </a>
+        <a href="#" class="nav-item" data-section="budgeting" onclick="switchSection('budgeting', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path d="M2 10h20" />
+          </svg>
+          <span>Budgeting</span>
+        </a>
+        <a href="#" class="nav-item" data-section="goals" onclick="switchSection('goals', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+          </svg>
+          <span>Savings Goals</span>
+        </a>
+        <a href="#" class="nav-item" data-section="settings" onclick="switchSection('settings', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <button class="nav-item logout-btn" onclick="exitPrivacyMode()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Exit Privacy Mode</span>
+      </button>
+      <div class="sidebar-user">
+        <div class="user-avatar" id="userInitials">🔒</div>
+        <div class="user-info">
+          <span class="user-name" id="userName">Private</span>
+          <span class="user-role">Local Only</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MOBILE HEADER -->
+  <div class="mobile-header" id="mobileHeader">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mobile-logo">
+      <div class="logo-icon-sm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#4d7a52" />
+          <path d="M12 6c0 3.5-2.5 6-6 6 3.5 0 6 2.5 6 6 0-3.5 2.5-6 6-6-3.5 0-6-2.5-6-6z" fill="#a8c5ac" />
+        </svg>
+      </div>
+      <span>Bloom</span>
+    </div>
+    <button class="mobile-profile" onclick="toggleSidebar()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- OVERLAY for mobile sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search transactions..."
+          oninput="filterTransactions(this.value)">
+      </div>
+      <div class="top-bar-actions">
+        <button class="icon-btn" id="notifBtn" title="Notifications" onclick="showToast('100% Private - No syncing')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <section class="section-page active" id="section-dashboard">
+      <!-- GREETING -->
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label" id="greetingLabel">Welcome to Privacy Mode</span>
+          <h1 class="page-title">🔒 100% Private Financial Tracking</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-primary" onclick="openModal('addTxModal')">
+            + Add Transaction
+          </button>
+        </div>
+      </div>
+
+      <!-- MONTH NAV -->
+      <div class="month-nav-bar">
+        <button class="month-arrow" id="prevMonth" title="Previous Month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <select id="monthSelect"></select>
+        <select id="yearSelect"></select>
+        <button class="month-arrow" id="nextMonth" title="Next Month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+        <button class="btn-today" onclick="jumpToCurrent()">Today</button>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="summary-grid">
+        <div class="summary-card card-balance" id="cardBalance">
+          <div class="card-head">
+            <span class="card-label">NET BALANCE</span>
+            <div class="card-icon-badge balance-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>
+            </div>
+          </div>
+          <div class="card-amount" id="netBalance">₹0.00</div>
+          <div class="card-trend" id="balanceTrend">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
+            </svg>
+            <span id="balanceTrendText">+0% from last month</span>
+          </div>
+        </div>
+        <div class="summary-card card-income" id="cardIncome">
+          <div class="card-head">
+            <span class="card-label">TOTAL INCOME</span>
+            <div class="card-icon-badge income-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>
+            </div>
+          </div>
+          <div class="card-amount" id="totalIncome">₹0.00</div>
+          <div class="card-sub" id="incomeCount">0 transactions</div>
+        </div>
+        <div class="summary-card card-expenses" id="cardExpenses">
+          <div class="card-head">
+            <span class="card-label">TOTAL EXPENSES</span>
+            <div class="card-icon-badge expense-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><path d="M12 8v0M12 16v0M8 12h0M16 12h0" /></svg>
+            </div>
+          </div>
+          <div class="card-amount" id="totalExpenses">₹0.00</div>
+          <div class="card-sub-row">
+            <span id="expenseCount">0 transactions</span>
+            <span id="budgetText" class="budget-label"></span>
+          </div>
+          <div class="budget-progress">
+            <div class="budget-bar" id="budgetBar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="summary-card card-savings" id="cardSavings">
+          <div class="card-head">
+            <span class="card-label">SAVINGS RATE</span>
+            <div class="card-icon-badge savings-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" /></svg>
+            </div>
+          </div>
+          <div class="card-amount" id="savingsRate">0%</div>
+          <div class="card-sub" id="savingsGoalText">Goal: 45%</div>
+        </div>
+      </div>
+
+      <!-- CATEGORICAL BREAKDOWN (Donut Chart) -->
+      <div class="chart-card donut-chart-card" style="margin:20px 0;">
+        <h2 class="card-title">Categorical Breakdown</h2>
+        <div class="donut-wrapper">
+          <div class="donut-container">
+            <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="90" cy="90" r="70" fill="none" stroke="#f0ebe3" stroke-width="28" />
+              <g id="donutSegments"></g>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-center-label">TOTAL</span>
+              <span class="donut-center-val" id="donutTotal">₹0</span>
+            </div>
+          </div>
+        </div>
+        <div class="legend" id="chartLegend">
+          <div class="empty-state" style="padding:10px 0;">
+            <p style="font-size:13px">No expenses yet</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW: TRANSACTIONS + GOALS -->
+      <div class="bottom-row">
+        <div class="transactions-card">
+          <div class="transactions-header">
+            <h2 class="card-title" style="margin-bottom:0">Recent Transactions</h2>
+          </div>
+          <div class="filter-pills">
+            <button class="pill active" onclick="setFilter('all', this)">All</button>
+            <button class="pill" onclick="setFilter('income', this)">Income</button>
+            <button class="pill" onclick="setFilter('expense', this)">Expenses</button>
+          </div>
+          <div class="tx-list" id="txList"></div>
+        </div>
+
+        <div class="right-column">
+          <div class="goals-card">
+            <div class="goals-header">
+              <h2 class="card-title" style="margin:0">Savings Goals</h2>
+            </div>
+            <div id="goalsPreview" class="goals-preview"></div>
+            <button class="create-goal-btn" onclick="openModal('goalsModal')">
+              + New Goal
+            </button>
+          </div>
+
+          <div class="tip-card">
+            <span class="tip-label">FINANCIAL TIP</span>
+            <p class="tip-text" id="financialTip">Start small, think big. Every transaction in privacy mode brings you closer to financial clarity.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS SECTION -->
+    <section class="section-page" id="section-transactions">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">All Transactions</span>
+          <h1 class="page-title">Transaction History</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-primary" onclick="openModal('addTxModal')">+ Add Transaction</button>
+        </div>
+      </div>
+      <div class="month-nav-bar">
+        <button class="month-arrow" onclick="prevM()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6" /></svg></button>
+        <span id="txMonthLabel" class="month-label-text"></span>
+        <button class="month-arrow" onclick="nextM()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6" /></svg></button>
+      </div>
+      <div class="transactions-card full-tx-card">
+        <div class="filter-pills" style="margin-bottom:16px">
+          <button class="pill active" onclick="setFilter('all', this)">All</button>
+          <button class="pill" onclick="setFilter('income', this)">Income</button>
+          <button class="pill" onclick="setFilter('expense', this)">Expenses</button>
+        </div>
+        <div class="tx-list" id="txListFull"></div>
+      </div>
+    </section>
+
+    <!-- BUDGETING SECTION -->
+    <section class="section-page" id="section-budgeting">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Budget Management</span>
+          <h1 class="page-title">Monthly Budgeting</h1>
+        </div>
+      </div>
+      <div class="budget-section-content">
+        <div class="budget-set-card">
+          <h2 class="card-title">Set Monthly Budget</h2>
+          <p style="color:var(--ink-light);margin-bottom:20px;font-size:14px;">Set a limit for your monthly expenses to keep spending on track.</p>
+          <div class="form-group modal-form-group">
+            <label class="modal-label" id="budgetAmountLabel">Budget Amount (₹)</label>
+            <input type="number" class="modal-input" id="budgetInputInline" placeholder="e.g. 2000" min="0" step="10">
+          </div>
+          <button class="btn-primary" onclick="saveBudgetInline()">Save Budget</button>
+        </div>
+        <div class="budget-overview-card">
+          <h2 class="card-title">Budget Overview</h2>
+          <div class="budget-visual">
+            <div class="budget-ring-container">
+              <svg width="200" height="200" style="max-width:100%">
+                <circle cx="100" cy="100" r="50" fill="none" stroke="var(--card-bg)" stroke-width="28" opacity="0.5"></circle>
+                <circle id="budgetRing" cx="100" cy="100" r="50" fill="none" stroke="var(--sage)" stroke-width="28" stroke-dasharray="0 314"></circle>
+              </svg>
+              <div class="budget-ring-text">
+                <div id="budgetPctText" style="font-size:28px;font-weight:700;">0%</div>
+                <div style="font-size:12px;color:var(--ink-faint);margin-top:4px;">of budget</div>
+              </div>
+            </div>
+            <div class="budget-details">
+              <div class="budget-detail-item">
+                <span class="budget-label">Budget</span>
+                <span class="budget-value" id="budgetAmountText">₹2000</span>
+              </div>
+              <div class="budget-detail-item">
+                <span class="budget-label">Spent</span>
+                <span class="budget-value" id="budgetSpentText">₹0</span>
+              </div>
+              <div class="budget-detail-item">
+                <span class="budget-label">Remaining</span>
+                <span class="budget-value" id="budgetRemainText">₹2000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GOALS SECTION -->
+    <section class="section-page" id="section-goals">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Financial Goals</span>
+          <h1 class="page-title">Savings Goals</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-primary" onclick="openModal('goalsModal')">+ New Goal</button>
+        </div>
+      </div>
+      <div id="goalsFullList" class="goals-full-list"></div>
+    </section>
+
+    <!-- SETTINGS SECTION -->
+    <section class="section-page" id="section-settings">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Preferences</span>
+          <h1 class="page-title">Settings</h1>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h2 class="card-title">Privacy Notice</h2>
+          <p style="color:var(--ink-light);font-size:14px;line-height:1.6;margin-bottom:16px;">
+            🔒 <strong>Your data is 100% private</strong>. Nothing is synced to any server. All transactions, goals, and settings are stored only in your browser's local storage. When you clear your browser data, your financial records will be deleted.
+          </p>
+          <p style="color:var(--ink-faint);font-size:13px;">Your privacy is our priority.</p>
+        </div>
+        <div class="settings-card">
+          <h2 class="card-title">Data Management</h2>
+          <div class="settings-actions">
+            <button class="btn-secondary" onclick="backupData()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Backup Data
+            </button>
+            <button class="btn-secondary" onclick="document.getElementById('importFile').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Import Data
+            </button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+            <button class="btn-secondary" onclick="exportCSV()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h2 class="card-title">Currency</h2>
+          <div class="form-group modal-form-group">
+            <label class="modal-label">Display Currency</label>
+            <select class="modal-input" id="currencySelect">
+              <option value="₹">₹ Indian Rupee (INR)</option>
+              <option value="$">$ US Dollar (USD)</option>
+              <option value="€">€ Euro (EUR)</option>
+              <option value="£">£ British Pound (GBP)</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="saveCurrency()">Save Currency</button>
+        </div>
+        <div class="settings-card">
+          <h2 class="card-title">Appearance</h2>
+          <div class="form-group modal-form-group">
+            <label class="modal-label">Theme</label>
+            <p style="color:var(--ink-light);font-size:13px;margin-bottom:12px;">Choose your preferred color scheme</p>
+            <button id="themeToggleBtn" class="btn-secondary" onclick="toggleTheme()" style="width:100%;justify-content:center;gap:8px;">
+              <span>🌙</span> Toggle Theme
+            </button>
+          </div>
+          <p style="color:var(--ink-faint);font-size:12px;margin-top:8px;">Cycles between: System → Dark → Light</p>
+        </div>
+        <div class="settings-card">
+          <h2 class="card-title">Exit Privacy Mode</h2>
+          <p style="color:var(--ink-light);font-size:14px;margin-bottom:16px;">Return to login page. Your private data will not be affected.</p>
+          <button class="btn-secondary" style="color:var(--coral);border-color:var(--coral);" onclick="exitPrivacyMode()">
+            Exit & Return to Login
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+
+    <!-- Add Transaction Modal -->
+    <div id="addTxModal" class="modal">
+      <div class="modal-header">
+        <h2 class="card-title" style="margin:0">Add Transaction</h2>
+        <button class="modal-close" onclick="closeModal(true)">&times;</button>
+      </div>
+      <div class="type-toggle">
+        <button class="type-btn active-income" id="btnIncome" onclick="setType('income')">Income</button>
+        <button class="type-btn" id="btnExpense" onclick="setType('expense')">Expense</button>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label">Description</label>
+        <input type="text" class="modal-input" id="txName" placeholder="e.g. Coffee, Salary…" maxlength="40">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" id="amountLabel">Amount (₹)</label>
+        <input type="number" class="modal-input" id="txAmount" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label">Category</label>
+        <select class="modal-input" id="txCategory">
+          <option value="Food & Drink">Food & Drink</option>
+          <option value="Transport">Transport</option>
+          <option value="Housing">Housing</option>
+          <option value="Health">Health</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Education">Education</option>
+          <option value="Salary">Salary</option>
+          <option value="Freelance">Freelance</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label">Date</label>
+        <input type="date" class="modal-input" id="txDate">
+      </div>
+      <button class="btn-primary full-width" onclick="addTransaction()" id="addTxBtn">Add Transaction</button>
+    </div>
+
+    <!-- Goals Modal -->
+    <div id="goalsModal" class="modal" style="max-width: 620px;">
+      <div class="modal-header">
+        <h2 class="card-title" style="margin:0">Financial Goals</h2>
+        <button class="modal-close" onclick="closeModal(true)">&times;</button>
+      </div>
+      <button onclick="showAddGoalForm()" class="btn-primary" style="margin-bottom:20px;">+ New Goal</button>
+      <div id="addGoalForm"
+        style="display:none; background:var(--warm-white); padding:20px; border-radius:12px; margin-bottom:20px;">
+        <div class="form-group modal-form-group">
+          <label class="modal-label">Goal Name</label>
+          <input type="text" class="modal-input" id="goalName" placeholder="e.g. Emergency Fund">
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" id="targetAmountLabel">Target Amount (₹)</label>
+          <input type="number" class="modal-input" id="goalTarget" placeholder="5000" min="1">
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label">Deadline</label>
+          <input type="date" class="modal-input" id="goalDeadline">
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="addNewGoal()" class="btn-primary">Create Goal</button>
+          <button onclick="hideAddGoalForm()" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+      <div id="goalsList"></div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="toast-message" id="toastMessage"></span>
+    <button class="toast-close" id="toastClose">✕</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/security.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/script.js" defer></script>
+</body>
+
+</html>

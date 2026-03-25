@@ -1,0 +1,23 @@
+# Bloom Finance - Web Crawler Instructions
+# https://bloom.finance/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /assets/
+
+# Allow specific crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap
+Sitemap: https://bloom.finance/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

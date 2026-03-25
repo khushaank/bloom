@@ -1,0 +1,49 @@
+/*
+ * Bloom Digital Conservatory - Human Readable Information
+ * Last updated: March 25, 2026
+ * https://bloom.finance/humans.txt
+ */
+
+/* TEAM */
+  Developer: Khush
+  Contact: team@bloom.finance
+  Location: Digital Conservatory
+
+/* SITE */
+  Standards: HTML5, CSS3, JavaScript ES6+
+  Components: Supabase, Chart.js, Responsive Design
+  Software: VS Code, Git, Modern Web Stack
+
+/* TECHNOLOGIES */
+  Frontend: HTML5, CSS Flexbox/Grid, Vanilla JavaScript
+  Backend: Supabase (PostgreSQL + Auth)
+  Security: Row Level Security (RLS), SSL/TLS, CSP
+  Analytics: Privacy-focused (no trackers)
+  Hosting: Secure HTTPS infrastructure
+
+/* STANDARDS COMPLIANCE */
+  Accessibility: WCAG 2.1 Level AA
+  Performance: Optimized for Core Web Vitals
+  Security: OWASP Top 10 Compliant
+  Privacy: GDPR & Privacy Policy Compliant
+
+/* CONTACT */
+  Email: team@bloom.finance
+  Twitter: @BloomFinance
+  Website: https://bloom.finance
+
+/* TIMELINE */
+  Started: 2024
+  Current Version: 1.0
+  Last Update: March 2026
+
+/* FEATURES */
+  • Real-time expense tracking
+  • Encrypted data storage
+  • Savings goals & budgeting
+  • Privacy mode (local-only)
+  • Beautiful dashboard
+  • Multi-currency support
+  • Bank-level security
+
+Thank you for visiting Bloom!
