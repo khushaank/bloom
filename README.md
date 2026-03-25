@@ -22,7 +22,7 @@ A sophisticated personal finance tracker designed for professionals who value pr
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/bloom/finance.git
+git clone https://github.com/khushaank/bloom.git
 cd bloom-finance
 ```
 
@@ -188,8 +188,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 - 📧 Email: support@bloom.finance
-- 🐛 Report bugs: [GitHub Issues](https://github.com/bloom/finance/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/bloom/finance/discussions)
+- 🐛 Report bugs: [GitHub Issues](https://github.com/khushaank/bloom/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/khushaank/bloom/discussions)
 
 ## Changelog
 
