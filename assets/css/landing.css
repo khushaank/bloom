@@ -460,3 +460,21 @@ body {
     .hero h1 { font-size: 32px; }
     .hero-image-wrapper { border-radius: 12px; }
 }
+
+@media (max-width: 360px) {
+    .landing-nav {
+        padding: 0 12px;
+        min-height: 64px;
+    }
+    .nav-brand-name { font-size: 18px; }
+    .nav-brand-sub { display: none; }
+    .hero { padding: 100px 8px 80px; gap: 24px; }
+    .hero h1 { font-size: 28px; }
+    .hero p { font-size: 14px; }
+    .hero-actions { gap: 10px; }
+    .btn-large { padding: 12px 18px; }
+    .feature-card { padding: 24px; }
+    .section-head h2 { font-size: 28px; }
+    .cta h2 { font-size: 28px; }
+    .cta p { font-size: 14px; }
+}

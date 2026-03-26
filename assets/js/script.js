@@ -19,6 +19,7 @@ let profileDropdownOpen = false;
 let currencySymbol = '₹';
 let currencyCode = 'INR';
 let numberFormat = 'en-IN';
+let userAvatar = null;
 
 const CATEGORY_COLORS = {
     'Food & Drink': '#e8a87c', 'Transport': '#7ab8c4', 'Housing': '#a09cc8',
@@ -68,17 +69,33 @@ function extractNameFromEmail(email) {
 // SUPABASE DATA LAYER
 // ============================================
 async function loadProfile() {
-    const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('display_name, monthly_budget, currency, profile_picture')
-        .eq('id', currentUserId)
-        .single();
-    
-    if (data) {
-        userName = data.display_name || extractNameFromEmail(userEmail) || '';
+    try {
+        // Load profile with currency and profile image from database
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('display_name,monthly_budget,currency,profile_picture')
+            .eq('id', currentUserId)
+            .maybeSingle();
+
+        if (error) {
+            console.warn('Supabase profile query error:', error.message, error.code);
+            // Set defaults and continue
+            userName = extractNameFromEmail(userEmail) || 'User';
+            return;
+        }
+
+        if (!data) {
+            // No profile exists yet - this is normal for new users
+            console.log('No profile found for user, using defaults');
+            userName = extractNameFromEmail(userEmail) || 'User';
+            return;
+        }
+
+        // Profile exists - use the data
+        userName = data.display_name || extractNameFromEmail(userEmail) || 'User';
         monthlyBudget = parseFloat(data.monthly_budget) || 2000;
-        
-        // Handle currency - it might be stored as code or symbol
+
+        // Handle currency from database
         let currency = data.currency || 'INR';
         const currencyMap = {
             'INR': { symbol: '₹', code: 'INR', locale: 'en-IN' },
@@ -90,53 +107,77 @@ async function loadProfile() {
             '€': { symbol: '€', code: 'EUR', locale: 'en-DE' },
             '£': { symbol: '£', code: 'GBP', locale: 'en-GB' }
         };
-        
+
         const currData = currencyMap[currency] || currencyMap['INR'];
         currencySymbol = currData.symbol;
         currencyCode = currData.code;
         numberFormat = currData.locale;
-        
-        // Load profile picture if available
-        if (data.profile_picture) {
-            localStorage.setItem('bloom_user_avatar', data.profile_picture);
-        }
-    } else if (error) {
-        console.warn('Error loading profile:', error);
+
+        // Load profile picture if available (profile_picture is the column currently in schema)
+        userAvatar = data.profile_picture || null;
+    } catch (err) {
+        console.error('Exception in loadProfile:', err);
+        // Ensure app still works with defaults
+        userName = extractNameFromEmail(userEmail) || 'User';
     }
 }
 
 async function loadTransactions() {
-    const { data, error } = await supabaseClient
-        .from('transactions')
-        .select('*')
-        .eq('user_id', currentUserId)
-        .order('transaction_date', { ascending: false });
-    if (data) {
-        transactions = data.map(t => ({
-            id: t.id,
-            name: t.name,
-            amount: parseFloat(t.amount),
-            category: t.category,
-            type: t.type,
-            date: t.transaction_date
-        }));
+    try {
+        const { data, error } = await supabaseClient
+            .from('transactions')
+            .select('*')
+            .eq('user_id', currentUserId)
+            .order('transaction_date', { ascending: false });
+
+        if (error) {
+            console.warn('Error loading transactions:', error);
+            transactions = [];
+            return;
+        }
+
+        if (data) {
+            transactions = data.map(t => ({
+                id: t.id,
+                name: t.name,
+                amount: parseFloat(t.amount),
+                category: t.category,
+                type: t.type,
+                date: t.transaction_date
+            }));
+        }
+    } catch (err) {
+        console.error('Exception in loadTransactions:', err);
+        transactions = [];
     }
 }
 
 async function loadGoals() {
-    const { data, error } = await supabaseClient
-        .from('goals')
-        .select('*')
-        .eq('user_id', currentUserId)
-        .order('created_at', { ascending: false });
-    if (data) {
-        goals = data.map(g => ({
-            id: g.id,
-            name: g.name,
-            target: parseFloat(g.target_amount),
-            current: parseFloat(g.current_amount),
-            deadline: g.deadline
-        }));
+    try {
+        const { data, error } = await supabaseClient
+            .from('goals')
+            .select('*')
+            .eq('user_id', currentUserId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.warn('Error loading goals:', error);
+            goals = [];
+            return;
+        }
+
+        if (data) {
+            goals = data.map(g => ({
+                id: g.id,
+                name: g.name,
+                target: parseFloat(g.target_amount),
+                current: parseFloat(g.current_amount),
+                deadline: g.deadline
+            }));
+        }
+    } catch (err) {
+        console.error('Exception in loadGoals:', err);
+        goals = [];
     }
 }
 
@@ -146,8 +187,8 @@ async function saveProfile() {
         await saveOfflineData();
         return;
     }
-    
-    // Map currency symbol to code
+
+    // Map currency symbol to code for database
     const currencyMap = {
         '₹': 'INR',
         '$': 'USD',
@@ -155,20 +196,22 @@ async function saveProfile() {
         '£': 'GBP'
     };
     const currencyToSave = currencyMap[currencySymbol] || 'INR';
-    
+
     try {
+        // Upsert gives safe behavior for new users and existing rows.
         const { data, error } = await supabaseClient
             .from('profiles')
-            .update({ 
-                display_name: userName, 
-                monthly_budget: monthlyBudget, 
-                currency: currencyToSave 
-            })
-            .eq('id', currentUserId)
+            .upsert({
+                id: currentUserId,
+                display_name: userName,
+                monthly_budget: monthlyBudget,
+                currency: currencyToSave,
+                profile_picture: userAvatar || null
+            }, { onConflict: 'id' })
             .select();
-        
+
         if (error) {
-            console.error('Profile update error:', error);
+            console.error('Profile save/upsert error:', error);
             showToast('Error saving profile');
         } else {
             console.log('Profile saved successfully');
@@ -295,6 +338,63 @@ function updateCurrencyLabels() {
     });
 }
 
+function setupSettingsSaveButtons() {
+    const nameInput = document.getElementById('settingsName');
+    const currencySelect = document.getElementById('currencySelect');
+
+    if (nameInput) {
+        nameInput.addEventListener('input', () => {
+            const saveNameBtn = document.getElementById('saveNameBtn');
+            if (saveNameBtn) {
+                saveNameBtn.style.display = nameInput.value.trim() && nameInput.value.trim() !== userName ? 'inline-flex' : 'none';
+            }
+        });
+    }
+
+    if (currencySelect) {
+        currencySelect.addEventListener('change', () => {
+            const saveCurrencyBtn = document.getElementById('saveCurrencyBtn');
+            if (saveCurrencyBtn) {
+                saveCurrencyBtn.style.display = currencySelect.value !== currencyCode ? 'inline-flex' : 'none';
+            }
+        });
+    }
+
+    const editPhotoBtnTop = document.getElementById('editPhotoBtnTop');
+    const avatarMenu = document.getElementById('avatarMenu');
+    const profileInput = document.getElementById('profilePictureInput');
+    const avatarUploadBtn = document.getElementById('avatarUploadBtn');
+    const avatarDeleteBtn = document.getElementById('avatarDeleteBtn');
+
+    if (editPhotoBtnTop && avatarMenu) {
+        editPhotoBtnTop.addEventListener('click', (e) => {
+            e.preventDefault();
+            avatarMenu.style.display = avatarMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+    }
+
+    if (avatarUploadBtn && profileInput) {
+        avatarUploadBtn.addEventListener('click', () => {
+            avatarMenu.style.display = 'none';
+            profileInput.click();
+        });
+    }
+
+    if (avatarDeleteBtn) {
+        avatarDeleteBtn.addEventListener('click', () => {
+            avatarMenu.style.display = 'none';
+            removeProfilePicture();
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (avatarMenu && editPhotoBtnTop && !editPhotoBtnTop.contains(e.target) && !avatarMenu.contains(e.target)) {
+            avatarMenu.style.display = 'none';
+        }
+    });
+}
+
+
 async function saveOfflineData() {
     const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
     if (privacyMode) {
@@ -330,14 +430,23 @@ function switchSection(section, el) {
     if (section === 'budgeting') updateBudgetSection();
     if (section === 'settings') {
         document.getElementById('settingsName').value = userName;
-        document.getElementById('currencySelect').value = currencySymbol;
-        
+        const selectedCurrency = currencyCode || 'INR';
+        document.getElementById('currencySelect').value = selectedCurrency;
+        const themeSelect = document.getElementById('themeSelect');
+        if (themeSelect) {
+            themeSelect.value = localStorage.getItem('bloom_theme') || 'dark';
+        }
+
+        // Update Save button visibility
+        document.getElementById('saveNameBtn').style.display = 'none';
+        document.getElementById('saveCurrencyBtn').style.display = 'none';
+
         // Update account name display
         const accountNameDisplay = document.getElementById('accountNameDisplay');
         if (accountNameDisplay) {
             accountNameDisplay.textContent = userName || 'User';
         }
-        
+
         // Show mode indicator in settings
         const settingsEmail = document.getElementById('settingsEmail');
         const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
@@ -349,6 +458,13 @@ function switchSection(section, el) {
             }
         }
     }
+
+    // Keep URL hash in sync with the current section
+    if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '#' + section);
+    } else {
+        window.location.hash = section;
+    }
 }
 
 function toggleSidebar() {
@@ -356,6 +472,13 @@ function toggleSidebar() {
     const overlay = document.getElementById('sidebarOverlay');
     sidebar.classList.toggle('open');
     overlay.classList.toggle('active');
+}
+
+function toggleSidebarCollapse() {
+    const sidebar = document.getElementById('sidebar');
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    sidebar.classList.toggle('collapsed');
+    localStorage.setItem('bloom_sidebar_collapsed', !isCollapsed);
 }
 
 // ============================================
@@ -560,9 +683,9 @@ function getGoogleAvatarUrl(email) {
 
 function setUserAvatar(element, email, name) {
     if (!element) return;
-    
+
     try {
-        const savedAvatar = localStorage.getItem('bloom_user_avatar');
+        const savedAvatar = userAvatar;
         if (savedAvatar) {
             // Use saved custom avatar if exists
             if (savedAvatar.startsWith('data:') || savedAvatar.startsWith('http')) {
@@ -579,7 +702,7 @@ function setUserAvatar(element, email, name) {
             }
             return;
         }
-        
+
         // Fallback to initials if no saved avatar
         const initials = getInitials(name);
         element.textContent = initials;
@@ -596,7 +719,7 @@ function updateUserAvatar() {
         const userInitialsEl = document.getElementById('userInitials');
         const profileInitials = document.getElementById('profileInitials');
         const settingsProfilePicture = document.getElementById('settingsProfilePicture');
-        
+
         if (userInitialsEl) {
             setUserAvatar(userInitialsEl, userEmail, userName);
         }
@@ -625,7 +748,7 @@ function updateGreeting() {
         if (greetingLabel) {
             greetingLabel.textContent = `${greeting}, ${displayName}`;
         }
-        
+
         const userNameEl = document.getElementById('userName');
         if (userNameEl) {
             userNameEl.textContent = userName || 'User';
@@ -640,7 +763,7 @@ function updateGreeting() {
         if (ddEmail) {
             ddEmail.textContent = userEmail || '';
         }
-        
+
         // Update avatar
         updateUserAvatar();
     } catch (error) {
@@ -745,7 +868,7 @@ function renderChart(txs) {
     try {
         const donutTotal = document.getElementById('donutTotal');
         if (!donutTotal) return; // Exit if chart elements don't exist (privacy mode)
-        
+
         const expenses = txs.filter(t => t.type === 'expense');
         const total = expenses.reduce((s, t) => s + t.amount, 0);
         donutTotal.textContent = fmt(total);
@@ -756,7 +879,7 @@ function renderChart(txs) {
 
         const seg = document.getElementById('donutSegments');
         const legend = document.getElementById('chartLegend');
-        
+
         if (!seg || !legend) return; // Exit if elements don't exist
 
         if (sorted.length === 0) {
@@ -1067,25 +1190,28 @@ async function saveBudgetInline() {
 
 async function saveUserName() {
     const name = document.getElementById('settingsName').value.trim();
-    if (name) {
+    if (name && name !== userName) {
         userName = name;
-        await saveProfile();
-        updateGreeting();
-        await saveOfflineData();
-        showToast('Name updated');
+        saveProfile().then(() => {
+            updateGreeting();
+            saveOfflineData();
+            showToast('Name updated');
+            document.getElementById('saveNameBtn').style.display = 'none';
+        });
     }
 }
 
 async function saveCurrency() {
     const selected = document.getElementById('currencySelect').value;
     const currencyMap = {
-        '₹': { symbol: '₹', code: 'INR', locale: 'en-IN' },
-        '$': { symbol: '$', code: 'USD', locale: 'en-US' },
-        '€': { symbol: '€', code: 'EUR', locale: 'en-DE' },
-        '£': { symbol: '£', code: 'GBP', locale: 'en-GB' }
+        'INR': { symbol: '₹', code: 'INR', locale: 'en-IN' },
+        'USD': { symbol: '$', code: 'USD', locale: 'en-US' },
+        'EUR': { symbol: '€', code: 'EUR', locale: 'en-DE' },
+        'GBP': { symbol: '£', code: 'GBP', locale: 'en-GB' }
     };
 
     const currData = currencyMap[selected];
+    if (!currData) return;
     currencySymbol = currData.symbol;
     currencyCode = currData.code;
     numberFormat = currData.locale;
@@ -1094,14 +1220,27 @@ async function saveCurrency() {
     updateCurrencyLabels();
     update();
     await saveOfflineData();
+    document.getElementById('saveCurrencyBtn').style.display = 'none';
     if (document.getElementById('addGoalForm')) document.getElementById('addGoalForm').style.display = 'none';
+}
+
+async function saveTheme() {
+    const theme = document.getElementById('themeSelect')?.value || 'dark';
+    
+    // Apply theme immediately
+    applyTheme(theme);
+    
+    // Save to localStorage for persistence (Supabase theme column will be added later)
+    localStorage.setItem('bloom_theme', theme);
+    
+    showToast(`Theme set to ${theme.charAt(0).toUpperCase() + theme.slice(1)}`);
 }
 
 function toggleTheme() {
     const html = document.documentElement;
     const currentTheme = localStorage.getItem('bloom_theme') || 'system';
     let newTheme;
-    
+
     if (currentTheme === 'system') {
         newTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
     } else if (currentTheme === 'dark') {
@@ -1109,7 +1248,7 @@ function toggleTheme() {
     } else {
         newTheme = 'system';
     }
-    
+
     localStorage.setItem('bloom_theme', newTheme);
     applyTheme(newTheme);
     updateThemeButton();
@@ -1118,8 +1257,8 @@ function toggleTheme() {
 
 function applyTheme(theme) {
     const html = document.documentElement;
-    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    
+    const isDark = theme === 'dark';
+
     if (isDark) {
         html.style.colorScheme = 'dark';
         html.classList.add('dark-mode');
@@ -1132,14 +1271,9 @@ function applyTheme(theme) {
 }
 
 function updateThemeButton() {
-    const btn = document.getElementById('themeToggleBtn');
-    if (btn) {
-        const theme = localStorage.getItem('bloom_theme') || 'system';
-        let icon = '🌙';
-        if (theme === 'light') icon = '☀️';
-        else if (theme === 'system') icon = '⚙️';
-        btn.querySelector('span').textContent = icon;
-    }
+    const theme = localStorage.getItem('bloom_theme') || 'system';
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) themeSelect.value = theme;
 }
 
 async function saveBudget() {
@@ -1346,22 +1480,22 @@ function exportPDF() {
 // ============================================
 function showToast(msg) {
     if (!msg) return;
-    
+
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
     const toastClose = document.getElementById('toastClose');
-    
+
     if (!toast || !toastMessage) return;
-    
+
     // Set message
     toastMessage.textContent = msg;
-    
+
     // Show toast
     toast.classList.add('show');
-    
+
     // Clear any existing timeout
     if (toast._timer) clearTimeout(toast._timer);
-    
+
     // Auto close after 5 seconds
     toast._timer = setTimeout(() => {
         if (toast.classList.contains('show')) {
@@ -1375,6 +1509,46 @@ function closeToast() {
     if (toast) {
         toast.classList.remove('show');
         if (toast._timer) clearTimeout(toast._timer);
+    }
+}
+
+// ============================================
+// MODAL MANAGEMENT
+// ============================================
+function openModal(modalId) {
+    const overlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById(modalId);
+
+    if (overlay && modal) {
+        // Hide all modals
+        document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+
+        // Show the requested modal
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+}
+
+function closeModal(force) {
+    const overlay = document.getElementById('modalOverlay');
+
+    // Handle different ways to close:
+    // 1. force === true: Close from close button (always close)
+    // 2. force is Event: Close only if clicking on overlay itself, not modal content
+    if (force === true) {
+        // Force close from close button
+        if (overlay) {
+            overlay.classList.remove('active');
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        }
+    } else if (force instanceof Event) {
+        // Only close if clicked directly on overlay (not on modal or its children)
+        if (force.target === overlay) {
+            if (overlay) {
+                overlay.classList.remove('active');
+                document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            }
+        }
     }
 }
 
@@ -1453,7 +1627,7 @@ window.addEventListener('resize', () => {
             update();
 
             showToast('Running in Privacy Mode - no data synced');
-            
+
             // Hide loader
             setTimeout(() => {
                 const loader = document.getElementById('globalLoader');
@@ -1491,6 +1665,7 @@ window.addEventListener('resize', () => {
 
         // Populate settings fields
         initializeSettingsFields();
+        setupSettingsSaveButtons();
 
         // UI init
         updateGreeting();
@@ -1518,65 +1693,77 @@ window.addEventListener('resize', () => {
     }
 })();
 
+// Sync section from URL hash on load
+(function setupHashNavigation() {
+    function openHashSection() {
+        const section = (window.location.hash || '#dashboard').replace('#', '');
+        const navEl = document.querySelector(`.nav-item[data-section="${section}"]`);
+        if (section && document.getElementById('section-' + section)) {
+            switchSection(section, navEl);
+        }
+    }
+
+    window.addEventListener('hashchange', openHashSection);
+    openHashSection();
+})();
+
 // ============================================
 // PROFILE PICTURE HANDLING
 // ============================================
 function handleProfilePictureUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
         showToast('Image must be less than 5MB');
         return;
     }
-    
+
     // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
         showToast('Please upload a valid image file (JPG, PNG, GIF, WebP)');
         return;
     }
-    
+
     // Read and save image
     const reader = new FileReader();
-    reader.onload = async function(e) {
+    reader.onload = async function (e) {
         const imageData = e.target.result;
         try {
-            // Save to localStorage
-            localStorage.setItem('bloom_user_avatar', imageData);
-            
-            // Save to Supabase if not in privacy mode
+            // Keep in-memory avatar variable only, no localStorage
+            userAvatar = imageData;
             const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
             if (!privacyMode && currentUserId) {
                 const { error } = await supabaseClient
                     .from('profiles')
                     .update({ profile_picture: imageData })
                     .eq('id', currentUserId);
-                
+
                 if (error) {
                     console.error('Error saving profile picture to Supabase:', error);
                 }
             }
-            
+
             // Update avatar display
             updateUserAvatar();
-            
+
             // Update settings preview
             const settingsProfilePicture = document.getElementById('settingsProfilePicture');
             if (settingsProfilePicture) {
                 settingsProfilePicture.style.backgroundImage = `url('${imageData}')`;
                 settingsProfilePicture.textContent = '';
             }
-            
+
             showToast('Profile picture updated!');
         } catch (error) {
             console.error('Error saving profile picture:', error);
             showToast('Error saving profile picture');
         }
     };
-    reader.onerror = function() {
+    reader.onerror = function () {
         showToast('Error reading image file');
     };
     reader.readAsDataURL(file);
@@ -1589,27 +1776,27 @@ function initProfilePictureUI() {
         if (settingsProfilePicture) {
             setUserAvatar(settingsProfilePicture, userEmail, userName);
         }
-        
+
         // Set up file input click handler for "Choose Photo" button
         const profilePictureInput = document.getElementById('profilePictureInput');
         const choosePhotoBtn = document.getElementById('choosePhotoBtn');
         if (choosePhotoBtn && profilePictureInput) {
-            choosePhotoBtn.addEventListener('click', function(e) {
+            choosePhotoBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 // Open the photo editor overlay
                 openPhotoEditOverlay();
             });
         }
-        
+
         // Set up remove photo button
         const removePhotoBtn = document.getElementById('removePhotoBtn');
         if (removePhotoBtn) {
-            removePhotoBtn.addEventListener('click', function(e) {
+            removePhotoBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 removeProfilePicture();
             });
         }
-        
+
         // Set up edit photo button hover effect
         const photoPreviewContainer = document.getElementById('photoPreviewContainer');
         if (photoPreviewContainer) {
@@ -1629,9 +1816,16 @@ function initProfilePictureUI() {
 }
 
 // Call on DOM ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    // Restore sidebar collapsed state
+    const isSidebarCollapsed = localStorage.getItem('bloom_sidebar_collapsed') === 'true';
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && isSidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+    }
+
     setTimeout(initProfilePictureUI, 500);
-    
+
     // Setup toast close button
     const toastClose = document.getElementById('toastClose');
     if (toastClose) {
@@ -1639,19 +1833,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function removeProfilePicture() {
+async function removeProfilePicture() {
     if (!confirm('Remove your profile picture?')) return;
-    
+
     try {
-        localStorage.removeItem('bloom_user_avatar');
+        userAvatar = null;
+        await supabaseClient
+            .from('profiles')
+            .update({ profile_picture: null })
+            .eq('id', currentUserId);
         updateUserAvatar();
-        
+
         const settingsProfilePicture = document.getElementById('settingsProfilePicture');
         if (settingsProfilePicture) {
             settingsProfilePicture.style.backgroundImage = 'none';
             settingsProfilePicture.textContent = getInitials(userName);
         }
-        
+
         showToast('Profile picture removed');
     } catch (error) {
         console.error('Error removing profile picture:', error);
@@ -1712,7 +1910,7 @@ async function saveUserName() {
 
         // Check if privacy mode
         const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-        
+
         if (!privacyMode) {
             // Save to Supabase
             const { error } = await supabaseClient
@@ -1730,13 +1928,13 @@ async function saveUserName() {
         // Update all avatars and UI
         updateUserAvatar();
         updateGreeting();
-        
+
         // Update the account name display
         const accountNameDisplay = document.getElementById('accountNameDisplay');
         if (accountNameDisplay) {
             accountNameDisplay.textContent = userName;
         }
-        
+
         showToast('Name saved successfully! 👤');
     } catch (error) {
         console.error('Error in saveUserName:', error);
@@ -1764,7 +1962,7 @@ async function saveBudget() {
 
         // Check if privacy mode
         const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-        
+
         if (!privacyMode) {
             // Save to Supabase
             const { error } = await supabaseClient
@@ -1827,79 +2025,79 @@ function resetPhotoEditor() {
         saturation: 100,
         isModified: false
     };
-    
+
     // Hide all sections
     document.getElementById('previewSection').style.display = 'none';
     document.getElementById('controlsSection').style.display = 'none';
     document.getElementById('actionButtons').style.display = 'none';
-    
+
     // Reset sliders
     document.getElementById('brightnessSlider').value = 100;
     document.getElementById('contrastSlider').value = 100;
     document.getElementById('saturationSlider').value = 100;
-    
+
     // Hide status messages
     document.getElementById('loadingState').classList.remove('active');
     document.getElementById('successState').classList.remove('active');
     document.getElementById('errorState').classList.remove('active');
-    
+
     // Clear upload area
     document.getElementById('photoUploadInput').value = '';
 }
 
 function handlePhotoUpload(event) {
     const file = event.target.files[0];
-    
+
     if (!file) {
         return;
     }
-    
+
     // Validate file
     if (!file.type.startsWith('image/')) {
         showPhotoError('Please select a valid image file');
         return;
     }
-    
+
     if (file.size > 5 * 1024 * 1024) {
         showPhotoError('Image size must be less than 5MB');
         return;
     }
-    
+
     // Show loading state
     document.getElementById('loadingState').classList.add('active');
-    
+
     // Read file
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             photoEditorState.originalImage = e.target.result;
             photoEditorState.currentImage = e.target.result;
-            
+
             // Show preview and controls
             document.getElementById('previewSection').style.display = 'flex';
             document.getElementById('controlsSection').style.display = 'flex';
             document.getElementById('actionButtons').style.display = 'flex';
-            
+
             // Update preview
             document.getElementById('photoPreviewImage').src = photoEditorState.currentImage;
-            
+
             // Hide loading state
             document.getElementById('loadingState').classList.remove('active');
             hidePhotoError();
         };
-        img.onerror = function() {
+        img.onerror = function () {
             document.getElementById('loadingState').classList.remove('active');
             showPhotoError('Failed to load image');
         };
         img.src = e.target.result;
     };
-    
-    reader.onerror = function() {
+
+    reader.onerror = function () {
         document.getElementById('loadingState').classList.remove('active');
         showPhotoError('Failed to read file');
     };
-    
+
     reader.readAsDataURL(file);
 }
 
@@ -1928,66 +2126,66 @@ function applyFilters() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    
-    img.onload = function() {
+
+    img.onload = function () {
         canvas.width = img.width;
         canvas.height = img.height;
-        
+
         // Draw with filters
         ctx.filter = `brightness(${photoEditorState.brightness}%) contrast(${photoEditorState.contrast}%) saturate(${photoEditorState.saturation}%)`;
         ctx.drawImage(img, 0, 0);
-        
+
         // Update preview
         photoEditorState.currentImage = canvas.toDataURL('image/jpeg', 0.95);
         document.getElementById('photoPreviewImage').src = photoEditorState.currentImage;
     };
-    
+
     img.src = photoEditorState.originalImage;
 }
 
 async function savePhotoEdit() {
     const btn = document.getElementById('savePhotoBtn');
     btn.disabled = true;
-    
+
     document.getElementById('loadingState').classList.add('active');
     hidePhotoError();
-    
+
     try {
         // Save to user profile
         if (currentUserId && supabase) {
             const { error } = await supabase
                 .from('profiles')
-                .update({ 
-                    profile_picture_url: photoEditorState.currentImage,
+                .update({
+                    profile_picture: photoEditorState.currentImage,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', currentUserId);
-            
+
             if (error) {
                 throw error;
             }
         }
-        
-        // Update avatar display
+
+        userAvatar = photoEditorState.currentImage;
         updateUserAvatar();
-        
+
         // Update settings preview if it exists
         const settingsProfilePicture = document.getElementById('settingsProfilePicture');
         if (settingsProfilePicture) {
             settingsProfilePicture.style.backgroundImage = `url('${photoEditorState.currentImage}')`;
             settingsProfilePicture.textContent = '';
         }
-        
+
         // Show success message
         document.getElementById('loadingState').classList.remove('active');
         document.getElementById('successState').classList.add('active');
-        
+
         // Close overlay after delay
         setTimeout(() => {
             closePhotoEditOverlay();
             showToast('Profile photo updated successfully!');
         }, 1500);
-        
+
     } catch (error) {
         console.error('Error saving photo:', error);
         document.getElementById('loadingState').classList.remove('active');
@@ -2008,39 +2206,39 @@ function hidePhotoError() {
 }
 
 // Close overlay when clicking outside
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const photoEditOverlay = document.getElementById('photoEditOverlay');
     if (photoEditOverlay) {
-        photoEditOverlay.addEventListener('click', function(e) {
+        photoEditOverlay.addEventListener('click', function (e) {
             if (e.target === this) {
                 closePhotoEditOverlay();
             }
         });
     }
-    
+
     // Handle drag and drop for upload area
     const uploadArea = document.getElementById('uploadArea');
     if (uploadArea) {
-        uploadArea.addEventListener('dragover', function(e) {
+        uploadArea.addEventListener('dragover', function (e) {
             e.preventDefault();
             e.stopPropagation();
             this.style.borderColor = 'var(--sage)';
             this.style.backgroundColor = 'rgba(122, 158, 126, 0.1)';
         });
-        
-        uploadArea.addEventListener('dragleave', function(e) {
+
+        uploadArea.addEventListener('dragleave', function (e) {
             e.preventDefault();
             e.stopPropagation();
             this.style.borderColor = 'var(--ink-faint)';
             this.style.backgroundColor = 'var(--warm-white)';
         });
-        
-        uploadArea.addEventListener('drop', function(e) {
+
+        uploadArea.addEventListener('drop', function (e) {
             e.preventDefault();
             e.stopPropagation();
             this.style.borderColor = 'var(--ink-faint)';
             this.style.backgroundColor = 'var(--warm-white)';
-            
+
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 document.getElementById('photoUploadInput').files = files;

@@ -47,8 +47,8 @@
     
     // Apply theme immediately to prevent flash
     (function() {
-      const theme = localStorage.getItem('bloom_theme') || 'system';
-      const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const theme = localStorage.getItem('bloom_theme') || 'dark';
+      const isDark = theme === 'dark';
       if (isDark) {
         document.documentElement.classList.add('dark-mode');
         document.documentElement.style.colorScheme = 'dark';
@@ -68,21 +68,28 @@
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-top">
-      <div class="sidebar-logo">
-        <div class="logo-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" fill="#4d7a52" />
-            <path d="M12 6c0 3.5-2.5 6-6 6 3.5 0 6 2.5 6 6 0-3.5 2.5-6 6-6-3.5 0-6-2.5-6-6z" fill="#a8c5ac" />
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="#4d7a52" />
+              <path d="M12 6c0 3.5-2.5 6-6 6 3.5 0 6 2.5 6 6 0-3.5 2.5-6 6-6-3.5 0-6-2.5-6-6z" fill="#a8c5ac" />
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-name">Bloom</span>
+            <span class="logo-sub">DIGITAL CONSERVATORY</span>
+          </div>
+        </div>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
-        </div>
-        <div class="logo-text">
-          <span class="logo-name">Bloom</span>
-          <span class="logo-sub">DIGITAL CONSERVATORY</span>
-        </div>
+        </button>
       </div>
 
       <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard', this)">
+        <a href="#dashboard" class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard', this)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7" rx="1" />
             <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -91,26 +98,26 @@
           </svg>
           <span>Dashboard</span>
         </a>
-        <a href="#" class="nav-item" data-section="transactions" onclick="switchSection('transactions', this)">
+        <a href="#transactions" class="nav-item" data-section="transactions" onclick="switchSection('transactions', this)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
           </svg>
           <span>Transactions</span>
         </a>
-        <a href="#" class="nav-item" data-section="budgeting" onclick="switchSection('budgeting', this)">
+        <a href="#budgeting" class="nav-item" data-section="budgeting" onclick="switchSection('budgeting', this)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="5" width="20" height="14" rx="2" />
             <path d="M2 10h20" />
           </svg>
           <span>Budgeting</span>
         </a>
-        <a href="#" class="nav-item" data-section="goals" onclick="switchSection('goals', this)">
+        <a href="#goals" class="nav-item" data-section="goals" onclick="switchSection('goals', this)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
           </svg>
           <span>Savings Goals</span>
         </a>
-        <a href="#" class="nav-item" data-section="settings" onclick="switchSection('settings', this)">
+        <a href="#settings" class="nav-item" data-section="settings" onclick="switchSection('settings', this)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3" />
             <path
@@ -166,26 +173,8 @@
 
     <!-- TOP BAR -->
     <div class="top-bar">
-      <div class="search-bar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
-        <input type="text" id="searchInput" placeholder="Search transactions..."
-          oninput="filterTransactions(this.value)">
-      </div>
+      <div class="top-bar-left"></div>
       <div class="top-bar-actions">
-        <button class="icon-btn" id="notifBtn" title="Notifications" onclick="showToast('No new notifications')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 01-3.46 0" />
-          </svg>
-          <span class="notif-dot"></span>
-        </button>
-        <div class="profile-dropdown-wrapper">
-          <button class="icon-btn profile-trigger" title="Profile" onclick="toggleProfileDropdown()">
-            <div class="profile-trigger-avatar" id="profileInitials">U</div>
-          </button>
           <div class="profile-dropdown" id="profileDropdown">
             <div class="profile-dropdown-header">
               <strong id="profileDropdownName">User</strong>
@@ -522,7 +511,7 @@
       <div class="settings-grid">
         <div class="settings-card">
           <h2 class="card-title">Data Management</h2>
-          <div class="settings-actions">
+          <div class="data-management-grid">
             <button class="btn-secondary" onclick="backupData()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
@@ -571,7 +560,17 @@
           
           <!-- Avatar and Quick Info -->
           <div class="account-header">
-            <div id="settingsProfilePicture" class="user-avatar profile-picture-preview large">U</div>
+            <div class="avatar-wrapper" style="position: relative;">
+              <div id="settingsProfilePicture" class="user-avatar profile-picture-preview large">U</div>
+              <button id="editPhotoBtnTop" class="avatar-edit-btn" title="Change profile picture">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+              </button>
+              <div id="avatarMenu" class="avatar-menu" style="display:none;">
+                <button class="avatar-menu-btn" id="avatarUploadBtn">Upload</button>
+                <button class="avatar-menu-btn" id="avatarDeleteBtn">Delete</button>
+              </div>
+              <input type="file" id="profilePictureInput" accept="image/*" style="display:none" onchange="handleProfilePictureUpload(event)">
+            </div>
             <div class="account-header-info">
               <div>
                 <p class="account-name-label">Display Name</p>
@@ -586,11 +585,10 @@
 
           <!-- Name Editor -->
           <div class="form-group modal-form-group" style="margin-top: 20px;">
-            <label class="modal-label">Change Display Name</label>
+            <label class="modal-label">Display Name</label>
             <input type="text" class="modal-input" id="settingsName" placeholder="Your name" maxlength="30">
-            <p class="settings-help-text">Auto-extracted from your email if not set</p>
           </div>
-          <button class="btn-primary" onclick="saveUserName()">
+          <button class="btn-primary" id="saveNameBtn" style="display:none;" onclick="saveUserName()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-right: 6px; vertical-align: middle;">
               <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
               <polyline points="17 21 17 13 7 13 7 21" />
@@ -599,78 +597,8 @@
             Save Name
           </button>
 
-          <!-- Photo Section -->
-          <div class="profile-picture-section">
-            <label class="profile-picture-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-right: 6px; vertical-align: middle;">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-              Profile Picture
-            </label>
-            
-            <!-- Photo Preview with Edit Overlay -->
-            <div class="photo-edit-wrapper" style="margin-bottom: 16px;">
-              <div id="photoPreviewContainer" class="photo-preview-container" style="position: relative; width: 96px; height: 96px; margin: 0; border: 3px solid var(--sage); border-radius: 50%;">
-                <div id="settingsProfilePictureLarge" class="user-avatar profile-picture-preview-large" style="width: 100%; height: 100%; font-size: 42px; border: none;">U</div>
-                <div class="photo-overlay" style="position: absolute; inset: 0; background: rgba(44, 36, 22, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;">
-                  <button id="editPhotoBtn" class="edit-photo-btn" onclick="openPhotoEditOverlay()" title="Edit photo" style="background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#4d7a52">
-                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor"/>
-                      <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <script>
-                const previewContainer = document.getElementById('photoPreviewContainer');
-                const overlay = previewContainer?.querySelector('.photo-overlay');
-                if (previewContainer && overlay) {
-                  previewContainer.addEventListener('mouseenter', () => overlay.style.opacity = '1');
-                  previewContainer.addEventListener('mouseleave', () => overlay.style.opacity = '0');
-                }
-              </script>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="profile-picture-buttons">
-              <input type="file" id="profilePictureInput" accept="image/*" class="profile-picture-input" onchange="handleProfilePictureUpload(event)">
-              <button id="choosePhotoBtn" class="btn-primary" style="width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                <span>Upload Photo</span>
-              </button>
-              <button id="removePhotoBtn" class="btn-secondary" style="width: 100%; border-color: var(--coral); color: var(--coral); display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                </svg>
-                <span>Remove Photo</span>
-              </button>
-            </div>
-            <p class="profile-picture-info">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-right: 4px; vertical-align: middle;">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-              </svg>
-              Max 5MB • JPG, PNG, GIF, WebP
-            </p>
-          </div>
-
-          <div class="settings-actions">
-            <a href="privacy.html" class="btn-secondary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              Privacy Policy
-            </a>
-            <button class="btn-secondary btn-logout" onclick="handleLogout()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              Sign Out
-            </button>
+          <div class="settings-footer" style="margin-top:16px; text-align:center;">
+            <a href="privacy.html" style="color: var(--ink-light); font-size: 13px; text-decoration: underline;">Privacy</a>
           </div>
         </div>
 
@@ -684,15 +612,15 @@
             Currency
           </h2>
           <div class="form-group modal-form-group">
-            <label class="modal-label">Display Currency</label>
-            <select class="modal-input" id="currencySelect">
-              <option value="₹">₹ Indian Rupee (INR)</option>
-              <option value="$">$ US Dollar (USD)</option>
-              <option value="€">€ Euro (EUR)</option>
-              <option value="£">£ British Pound (GBP)</option>
+            <label class="modal-label" for="currencySelect">Display Currency</label>
+            <select class="modal-input" id="currencySelect" required>
+              <option value="INR">Indian Rupee (INR)</option>
+              <option value="USD">US Dollar (USD)</option>
+              <option value="EUR">Euro (EUR)</option>
+              <option value="GBP">British Pound (GBP)</option>
             </select>
           </div>
-          <button class="btn-primary" onclick="saveCurrency()">
+          <button class="btn-primary" id="saveCurrencyBtn" style="display:none;" onclick="saveCurrency()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-right: 6px; vertical-align: middle;">
               <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
               <polyline points="17 21 17 13 7 13 7 21" />
@@ -717,17 +645,12 @@
             Appearance
           </h2>
           <div class="form-group modal-form-group">
-            <label class="modal-label">Theme</label>
-            <p class="settings-help-text">Choose your preferred color scheme</p>
-            <button id="themeToggleBtn" class="btn-secondary theme-button" onclick="toggleTheme()">
-              <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-right: 6px; vertical-align: middle;">
-                <!-- Moon icon by default -->
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-              <span id="themeLabel">Dark Mode</span>
-            </button>
+            <label class="modal-label" for="themeSelect">Theme</label>
+            <select id="themeSelect" class="modal-input" required onchange="saveTheme()">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
           </div>
-          <p class="settings-help-note">Cycles between: System → Dark → Light</p>
         </div>
       </div>
     </section>
