@@ -4,26 +4,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://bloom.finance/">
+
   <!-- SEO Meta Tags -->
-  <title>Bloom | Master Your Wealth With Elegance</title>
-  <meta name="description" content="Take control of your financial future. Track spending, set goals, and build wealth with Bloom's intelligent insights and beautiful dashboard designed for professionals.">
-  <meta name="keywords" content="finance, budget, money management, personal finance tracker, wealth budgeting, Bloom, digital conservatory, expense tracking">
+  <title>Bloom | Master Your Wealth With Elegance - Personal Finance Tracker</title>
+  <meta name="description" content="Take control of your financial future. Track spending, set goals, and build wealth with Bloom's intelligent insights and beautiful dashboard designed for professionals. Free personal finance management.">
+  <meta name="keywords" content="personal finance tracker, budget app, expense tracker, financial planning, wealth management, money management, savings goals, financial dashboard, budget planner, expense management">
   <meta name="author" content="Bloom Digital Conservatory">
-  
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="theme-color" content="#4d7a52">
+
+  <!-- Additional SEO Meta Tags -->
+  <meta name="language" content="English">
+  <meta name="geo.region" content="US">
+  <meta name="geo.placename" content="United States">
+  <meta name="classification" content="Finance, Personal Finance, Budgeting">
+  <meta name="rating" content="General">
+  <meta name="distribution" content="Global">
+  <meta name="revisit-after" content="7 days">
+
   <!-- Open Graph / Social -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bloom.finance/">
-  <meta property="og:title" content="Bloom | Master Your Wealth With Elegance">
-  <meta property="og:description" content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard.">
-  <meta property="og:image" content="assets/images/logo.png">
-  
+  <meta property="og:title" content="Bloom | Master Your Wealth With Elegance - Personal Finance Tracker">
+  <meta property="og:description" content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard. Free personal finance management tool.">
+  <meta property="og:image" content="https://bloom.finance/assets/images/logo.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bloom Personal Finance Tracker Logo">
+  <meta property="og:site_name" content="Bloom">
+  <meta property="og:locale" content="en_US">
+
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://bloom.finance/">
-  <meta property="twitter:title" content="Bloom | Master Your Wealth With Elegance">
-  <meta property="twitter:description" content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard.">
-  <meta property="twitter:image" content="assets/images/logo.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://bloom.finance/">
+  <meta name="twitter:title" content="Bloom | Master Your Wealth With Elegance">
+  <meta name="twitter:description" content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard.">
+  <meta name="twitter:image" content="https://bloom.finance/assets/images/logo.png">
+  <meta name="twitter:image:alt" content="Bloom Personal Finance Tracker">
+  <meta name="twitter:creator" content="@bloomfinance">
+  <meta name="twitter:site" content="@bloomfinance">
 
   <!-- Core Fonts and Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -40,20 +62,87 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Bloom Personal Finance Tracker",
-    "applicationCategory": "FinanceApplication",
-    "operatingSystem": "Web",
-    "description": "Premium personal finance tracking to monitor spending, create budgets, and track goals seamlessly.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Bloom Digital Conservatory"
-    }
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://bloom.finance/#organization",
+        "name": "Bloom Digital Conservatory",
+        "url": "https://bloom.finance/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://bloom.finance/assets/images/logo.png",
+          "width": 512,
+          "height": 512
+        },
+        "description": "Premium personal finance tracking platform designed for professionals and individuals seeking financial clarity and wealth building.",
+        "foundingDate": "2026",
+        "sameAs": [
+          "https://twitter.com/bloomfinance"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://bloom.finance/#website",
+        "url": "https://bloom.finance/",
+        "name": "Bloom | Personal Finance Tracker",
+        "description": "Master your wealth with elegance. Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard.",
+        "publisher": {
+          "@id": "https://bloom.finance/#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://bloom.finance/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://bloom.finance/#softwareapplication",
+        "name": "Bloom Personal Finance Tracker",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "description": "Comprehensive personal finance management tool for tracking expenses, creating budgets, setting financial goals, and monitoring wealth building progress.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        "featureList": [
+          "Expense Tracking",
+          "Budget Creation",
+          "Goal Setting",
+          "Financial Analytics",
+          "Multi-currency Support",
+          "Data Export",
+          "Privacy Mode"
+        ],
+        "screenshot": "https://bloom.finance/assets/images/logo.png",
+        "publisher": {
+          "@id": "https://bloom.finance/#organization"
+        },
+        "url": "https://bloom.finance/finance-tool.html"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://bloom.finance/#webpage",
+        "url": "https://bloom.finance/",
+        "name": "Bloom | Master Your Wealth With Elegance - Personal Finance Tracker",
+        "description": "Take control of your financial future with Bloom's intelligent personal finance tracker. Free budget planning, expense tracking, and wealth building tools.",
+        "isPartOf": {
+          "@id": "https://bloom.finance/#website"
+        },
+        "about": {
+          "@id": "https://bloom.finance/#organization"
+        },
+        "primaryImageOfPage": {
+          "@type": "ImageObject",
+          "url": "https://bloom.finance/assets/images/logo.png"
+        },
+        "datePublished": "2026-03-25",
+        "dateModified": "2026-03-25"
+      }
+    ]
   }
   </script>
 </head>

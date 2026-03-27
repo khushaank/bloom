@@ -20,6 +20,7 @@ let currencySymbol = '₹';
 let currencyCode = 'INR';
 let numberFormat = 'en-IN';
 let userAvatar = null;
+let subscriptions = []; // New state for recurring transactions
 
 const CATEGORY_COLORS = {
     'Food & Drink': '#e8a87c', 'Transport': '#7ab8c4', 'Housing': '#a09cc8',
@@ -48,6 +49,47 @@ const FINANCIAL_TIPS = [
     "Financial freedom isn't about how much you earn, but how much you keep.",
     "Small consistent savings beats sporadic large deposits every time."
 ];
+
+// Transaction name suggestions
+const INCOME_SUGGESTIONS = [
+    'Salary', 'Bonus', 'Freelance', 'Side Hustle', 'Investment', 'Dividend',
+    'Rental Income', 'Business Income', 'Commission', 'Tips', 'Gift', 'Refund'
+];
+
+const EXPENSE_SUGGESTIONS = [
+    'Coffee', 'Lunch', 'Dinner', 'Groceries', 'Transport', 'Gas', 'Parking',
+    'Shopping', 'Entertainment', 'Movie', 'Concert', 'Gym', 'Health', 'Doctor',
+    'Medicine', 'Rent', 'Utilities', 'Internet', 'Phone', 'Insurance', 'Education',
+    'Books', 'Subscription', 'Software', 'Travel', 'Hotel', 'Flight', 'Taxi'
+];
+
+// Subscription name suggestions
+const SUBSCRIPTION_INCOME_SUGGESTIONS = [
+    'Salary', 'Freelance Income', 'Rental Income', 'Business Income', 'Investment Returns', 'Pension'
+];
+
+const SUBSCRIPTION_EXPENSE_SUGGESTIONS = [
+    'Netflix', 'Spotify', 'Amazon Prime', 'Gym Membership', 'Phone Bill', 'Internet', 'Rent',
+    'Insurance', 'Loan Payment', 'Credit Card', 'Car Payment', 'Utilities', 'Software Subscription'
+];
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function setLoading(btn, loading) {
+    if (!btn) return;
+    const text = btn.querySelector('.btn-text');
+    const spinner = btn.querySelector('.btn-loading');
+    if (loading) {
+        if (text) text.style.display = 'none';
+        if (spinner) spinner.style.display = 'inline-flex';
+        btn.disabled = true;
+    } else {
+        if (text) text.style.display = 'inline';
+        if (spinner) spinner.style.display = 'none';
+        btn.disabled = false;
+    }
+}
 
 // ============================================
 // NAME UTILITIES
@@ -143,12 +185,46 @@ async function loadTransactions() {
                 amount: parseFloat(t.amount),
                 category: t.category,
                 type: t.type,
-                date: t.transaction_date
+                date: t.transaction_date,
+                is_recurring: t.is_recurring || false,
+                recurring_frequency: t.recurring_frequency || null
             }));
         }
     } catch (err) {
         console.error('Exception in loadTransactions:', err);
         transactions = [];
+    }
+}
+
+async function loadSubscriptions() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('transactions')
+            .select('*')
+            .eq('user_id', currentUserId)
+            .eq('is_recurring', true)
+            .order('transaction_date', { ascending: false });
+
+        if (error) {
+            console.warn('Error loading subscriptions:', error);
+            subscriptions = [];
+            return;
+        }
+
+        if (data) {
+            subscriptions = data.map(t => ({
+                id: t.id,
+                name: t.name,
+                amount: parseFloat(t.amount),
+                category: t.category,
+                type: t.type,
+                date: t.transaction_date,
+                recurring_frequency: t.recurring_frequency || 'monthly'
+            }));
+        }
+    } catch (err) {
+        console.error('Exception in loadSubscriptions:', err);
+        subscriptions = [];
     }
 }
 
@@ -170,14 +246,389 @@ async function loadGoals() {
             goals = data.map(g => ({
                 id: g.id,
                 name: g.name,
-                target: parseFloat(g.target_amount),
-                current: parseFloat(g.current_amount),
-                deadline: g.deadline
+                targetAmount: parseFloat(g.target_amount),
+                currentAmount: parseFloat(g.current_amount || 0),
+                deadline: g.deadline,
+                createdAt: g.created_at
             }));
         }
     } catch (err) {
         console.error('Exception in loadGoals:', err);
         goals = [];
+    }
+}
+
+async function processRecurringTransactions() {
+    const today = new Date();
+    const processed = [];
+
+    for (const sub of subscriptions) {
+        const lastTxDate = new Date(sub.date);
+        let nextDate = new Date(lastTxDate);
+
+        // Calculate next occurrence
+        switch (sub.recurring_frequency) {
+            case 'weekly': nextDate.setDate(nextDate.getDate() + 7); break;
+            case 'monthly': nextDate.setMonth(nextDate.getMonth() + 1); break;
+            case 'yearly': nextDate.setFullYear(nextDate.getFullYear() + 1); break;
+            default: nextDate.setMonth(nextDate.getMonth() + 1);
+        }
+
+        // If due, create the transaction AND update the subscription date in DB
+        if (nextDate <= today) {
+            const newTx = {
+                name: sub.name,
+                amount: sub.amount,
+                category: sub.category,
+                type: sub.type,
+                date: nextDate.toISOString().split('T')[0],
+                is_recurring: false // The instance is just a regular transaction
+            };
+
+            const inserted = await insertTransaction(newTx);
+            if (inserted) {
+                processed.push(inserted);
+
+                // CRITICAL FIX: Update the parent subscription date in Supabase 
+                // so it doesn't trigger again until the next period.
+                await supabaseClient
+                    .from('transactions')
+                    .update({ transaction_date: newTx.date })
+                    .eq('id', sub.id);
+
+                sub.date = newTx.date; // Update local state
+            }
+        }
+    }
+
+    if (processed.length > 0) {
+        await loadTransactions();
+        showToast(`Processed ${processed.length} recurring items`);
+    }
+}
+
+// ============================================
+// EXPORT FUNCTIONALITY
+// ============================================
+function exportCSV() {
+    const filteredTx = getFilteredTransactions();
+    if (filteredTx.length === 0) {
+        showToast('No transactions to export');
+        return;
+    }
+
+    const csvContent = [
+        ['Date', 'Name', 'Category', 'Type', 'Amount', 'Recurring'],
+        ...filteredTx.map(tx => [
+            tx.date,
+            tx.name,
+            tx.category,
+            tx.type,
+            tx.amount.toFixed(2),
+            tx.is_recurring ? 'Yes' : 'No'
+        ])
+    ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bloom-transactions-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('CSV exported successfully');
+}
+
+async function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const filteredTx = getFilteredTransactions();
+
+    if (filteredTx.length === 0) {
+        showToast('No transactions to export');
+        return;
+    }
+
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.text('Bloom - Transaction Report', 20, 30);
+    doc.setFontSize(12);
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, 20, 40);
+
+    let yPosition = 60;
+    doc.setFontSize(10);
+    doc.text('Date', 20, yPosition);
+    doc.text('Name', 60, yPosition);
+    doc.text('Category', 120, yPosition);
+    doc.text('Type', 160, yPosition);
+    doc.text('Amount', 180, yPosition);
+
+    yPosition += 10;
+
+    filteredTx.forEach(tx => {
+        if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 30;
+        }
+
+        doc.text(tx.date, 20, yPosition);
+        doc.text(tx.name.substring(0, 25), 60, yPosition);
+        doc.text(tx.category, 120, yPosition);
+        doc.text(tx.type, 160, yPosition);
+        doc.text(`${currencySymbol}${tx.amount.toFixed(2)}`, 180, yPosition);
+        yPosition += 8;
+    });
+
+    doc.save(`bloom-transactions-${new Date().toISOString().split('T')[0]}.pdf`);
+    showToast('PDF exported successfully');
+}
+
+function getFilteredTransactions() {
+    let filtered = transactions;
+
+    // Apply date filter
+    const startOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
+    const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0);
+    filtered = filtered.filter(tx => {
+        const txDate = new Date(tx.date);
+        return txDate >= startOfMonth && txDate <= endOfMonth;
+    });
+
+    // Apply type filter
+    if (filter !== 'all') {
+        filtered = filtered.filter(tx => tx.type === filter);
+    }
+
+    return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+// ============================================
+// SPENDING HEATMAP FUNCTIONALITY
+// ============================================
+function getHeatmapIntensityClass(intensity) {
+    if (intensity === 0) return 'intensity-0';
+    if (intensity < 0.25) return 'intensity-1';
+    if (intensity < 0.5) return 'intensity-2';
+    if (intensity < 0.75) return 'intensity-3';
+    return 'intensity-4';
+}
+
+function generateSpendingHeatmap() {
+    const currentMonth = viewDate;
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+
+    // Get all days in the month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    // Calculate spending per day
+    const dailySpending = {};
+    transactions.filter(tx => tx.type === 'expense').forEach(tx => {
+        const txDate = new Date(tx.date);
+        if (txDate.getFullYear() === year && txDate.getMonth() === month) {
+            const day = txDate.getDate();
+            dailySpending[day] = (dailySpending[day] || 0) + tx.amount;
+        }
+    });
+
+    // Find max spending for color scaling
+    const maxSpending = Math.max(...Object.values(dailySpending), 0);
+
+    // Generate calendar HTML
+    let calendarHTML = '<div class="heatmap-calendar">';
+    calendarHTML += `<h3 class="heatmap-title">${MONTHS[month]} ${year} Spending Heatmap</h3>`;
+    calendarHTML += '<div class="heatmap-grid">';
+
+    // Day labels
+    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayLabels.forEach(day => {
+        calendarHTML += `<div class="heatmap-day-label">${day}</div>`;
+    });
+
+    // Empty cells for days before the first day of the month
+    const firstDayOfWeek = firstDay.getDay();
+    for (let i = 0; i < firstDayOfWeek; i++) {
+        calendarHTML += '<div class="heatmap-cell empty"></div>';
+    }
+
+    // Calendar cells
+    for (let day = 1; day <= daysInMonth; day++) {
+        const spending = dailySpending[day] || 0;
+        const intensity = maxSpending > 0 ? spending / maxSpending : 0;
+        const intensityClass = getHeatmapIntensityClass(intensity);
+
+        calendarHTML += `
+            <div class="heatmap-cell ${intensityClass}" title="${day}: ${currencySymbol}${spending.toFixed(2)}">
+                <span class="heatmap-day">${day}</span>
+                <span class="heatmap-amount">${spending > 0 ? currencySymbol + spending.toFixed(0) : ''}</span>
+            </div>
+        `;
+    }
+
+    calendarHTML += '</div>';
+    calendarHTML += '<div class="heatmap-legend">';
+    calendarHTML += '<span class="legend-label">Less</span>';
+    calendarHTML += '<div class="legend-colors">';
+    calendarHTML += '<div class="legend-color intensity-0"></div>';
+    calendarHTML += '<div class="legend-color intensity-1"></div>';
+    calendarHTML += '<div class="legend-color intensity-2"></div>';
+    calendarHTML += '<div class="legend-color intensity-3"></div>';
+    calendarHTML += '<div class="legend-color intensity-4"></div>';
+    calendarHTML += '</div>';
+    calendarHTML += '<span class="legend-label">More</span>';
+    calendarHTML += '</div>';
+    calendarHTML += '</div>';
+
+    return calendarHTML;
+}
+
+function renderSpendingHeatmap() {
+    const heatmapContainer = document.getElementById('spendingHeatmap');
+    if (!heatmapContainer) return;
+
+    const heatmapHTML = generateSpendingHeatmap();
+    heatmapContainer.innerHTML = heatmapHTML;
+}
+
+// ============================================
+// SUBSCRIPTION MANAGEMENT
+// ============================================
+let currentSubType = 'expense';
+
+function openSubscriptionModal() {
+    console.log('openSubscriptionModal called');
+    console.log('Resetting subscription form...');
+    resetSubscriptionForm();
+    console.log('Opening modal...');
+    openModal('subscriptionModal');
+}
+
+async function addSubscription() {
+    const name = document.getElementById('subName').value.trim();
+    const amount = parseFloat(document.getElementById('subAmount').value);
+    const category = document.getElementById('subCategory').value;
+    const frequency = document.getElementById('subFrequency').value;
+    const startDate = document.getElementById('subStartDate').value;
+    const btn = document.getElementById('addSubBtn');
+
+    if (!name || isNaN(amount) || !startDate) {
+        showToast('Please fill in all fields correctly');
+        return;
+    }
+
+    const newSub = {
+        user_id: currentUserId,
+        name: name,
+        amount: amount,
+        category: category,
+        type: currentSubType, // Uses the toggle state (income/expense)
+        transaction_date: startDate,
+        is_recurring: true,
+        recurring_frequency: frequency
+    };
+
+    console.log('Adding subscription:', newSub);
+    setLoading(btn, true);
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('transactions')
+            .insert([newSub]);
+
+        console.log('Supabase response:', { data, error });
+
+        setLoading(btn, false);
+
+        if (error) {
+            console.error('Error saving subscription:', error);
+            showToast('Error saving subscription: ' + error.message);
+        } else {
+            showToast('Subscription added!');
+            closeModal(true);
+            resetSubscriptionForm();
+            await loadSubscriptions();
+            renderSubscriptions();
+        }
+    } catch (err) {
+        console.error('Exception in addSubscription:', err);
+        setLoading(btn, false);
+        showToast('Error: ' + err.message);
+    }
+}
+
+function resetSubscriptionForm() {
+    document.getElementById('subName').value = '';
+    document.getElementById('subAmount').value = '';
+    document.getElementById('subCategory').value = 'Food & Drink';
+    document.getElementById('subFrequency').value = 'monthly';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('subStartDate').value = today;
+    setSubscriptionType('expense');
+}
+
+function setSubscriptionType(type) {
+    currentSubType = type;
+    document.getElementById('subBtnIncome').classList.toggle('active-income', type === 'income');
+    document.getElementById('subBtnExpense').classList.toggle('active-expense', type === 'expense');
+    document.getElementById('subAmountLabel').textContent = `Amount (${currencySymbol})`;
+    
+    // Hide suggestions when type changes
+    const suggestionsDiv = document.getElementById('subNameSuggestions');
+    if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+
+function renderSubscriptions() {
+    const container = document.getElementById('subscriptionsGrid');
+    if (!container) return;
+
+    if (subscriptions.length === 0) {
+        container.innerHTML = `<div class="empty-state"><p>No active subscriptions.</p></div>`;
+        return;
+    }
+
+    container.innerHTML = subscriptions.map(sub => `
+        <div class="subscription-card">
+            <div class="subscription-header">
+                <div class="subscription-icon" style="background: ${CATEGORY_COLORS[sub.category] || '#c0b8a8'};">
+                    ${CATEGORY_LABELS[sub.category] || (sub.category || 'OT').substring(0, 2)}
+                </div>
+                <div class="subscription-info">
+                    <h4 class="subscription-name">${sub.name}</h4>
+                    <div class="subscription-category">${sub.category}</div>
+                    <div class="subscription-frequency">${sub.recurring_frequency}</div>
+                </div>
+            </div>
+            <div class="subscription-amount ${sub.type === 'income' ? 'text-success' : ''}">${fmt(sub.amount)}</div>
+            <div class="subscription-actions">
+                <button class="subscription-delete" onclick="deleteSubscription('${sub.id}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function deleteSubscription(id) {
+    if (!confirm('Are you sure you want to remove this subscription?')) return;
+
+    const { error } = await supabaseClient
+        .from('transactions')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        showToast('Error deleting subscription');
+    } else {
+        showToast('Subscription removed');
+        await loadSubscriptions();
+        renderSubscriptions();
     }
 }
 
@@ -231,7 +682,9 @@ async function insertTransaction(tx) {
             amount: tx.amount,
             category: tx.category,
             type: tx.type,
-            transaction_date: tx.date
+            transaction_date: tx.date,
+            is_recurring: tx.is_recurring || false,
+            recurring_frequency: tx.recurring_frequency || null
         })
         .select()
         .single();
@@ -370,6 +823,10 @@ function setupSettingsSaveButtons() {
         editPhotoBtnTop.addEventListener('click', (e) => {
             e.preventDefault();
             avatarMenu.style.display = avatarMenu.style.display === 'flex' ? 'none' : 'flex';
+            if (!userAvatar) {
+                // Take user directly to upload when no avatar exists
+                avatarUploadBtn.click();
+            }
         });
     }
 
@@ -377,6 +834,19 @@ function setupSettingsSaveButtons() {
         avatarUploadBtn.addEventListener('click', () => {
             avatarMenu.style.display = 'none';
             profileInput.click();
+        });
+    }
+
+    const avatarEditBtn = document.getElementById('avatarEditBtn');
+    if (avatarEditBtn) {
+        avatarEditBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            avatarMenu.style.display = 'none';
+            if (userAvatar) {
+                openPhotoEditOverlay(userAvatar);
+            } else {
+                showToast('Please upload an image before editing.');
+            }
         });
     }
 
@@ -392,6 +862,9 @@ function setupSettingsSaveButtons() {
             avatarMenu.style.display = 'none';
         }
     });
+
+    // Ensure correct visibility for edit button state
+    updateAvatarEditControlVisibility();
 }
 
 
@@ -428,6 +901,7 @@ function switchSection(section, el) {
     if (section === 'transactions') renderFullTxList();
     if (section === 'goals') renderGoalsFull();
     if (section === 'budgeting') updateBudgetSection();
+    if (section === 'subscriptions') renderSubscriptions();
     if (section === 'settings') {
         document.getElementById('settingsName').value = userName;
         const selectedCurrency = currencyCode || 'INR';
@@ -514,6 +988,12 @@ function setType(t) {
     const sel = document.getElementById('txCategory');
     if (t === 'income') sel.value = 'Salary';
     else sel.value = 'Food & Drink';
+    
+    // Hide suggestions when type changes
+    const suggestionsDiv = document.getElementById('txNameSuggestions');
+    if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+    }
 }
 
 function setFilter(f, el) {
@@ -651,6 +1131,8 @@ function update() {
     renderNav();
     renderAreaChart();
     renderGoalsPreview();
+    renderSpendingHeatmap();
+    renderSubscriptions();
     updateGreeting();
 }
 
@@ -714,6 +1196,29 @@ function setUserAvatar(element, email, name) {
     }
 }
 
+function updateAvatarEditControlVisibility() {
+    const editPhotoBtnTop = document.getElementById('editPhotoBtnTop');
+    const avatarUploadBtn = document.getElementById('avatarUploadBtn');
+    const avatarEditBtn = document.getElementById('avatarEditBtn');
+    const avatarDeleteBtn = document.getElementById('avatarDeleteBtn');
+    const hasAvatar = !!userAvatar;
+
+    // Keep pen icon always available (user can still upload when there is no photo)
+    if (editPhotoBtnTop) {
+        editPhotoBtnTop.style.display = 'block';
+    }
+
+    if (avatarUploadBtn) {
+        avatarUploadBtn.style.display = 'block';
+    }
+    if (avatarEditBtn) {
+        avatarEditBtn.style.display = hasAvatar ? 'block' : 'none';
+    }
+    if (avatarDeleteBtn) {
+        avatarDeleteBtn.style.display = hasAvatar ? 'block' : 'none';
+    }
+}
+
 function updateUserAvatar() {
     try {
         const userInitialsEl = document.getElementById('userInitials');
@@ -729,6 +1234,8 @@ function updateUserAvatar() {
         if (settingsProfilePicture) {
             setUserAvatar(settingsProfilePicture, userEmail, userName);
         }
+
+        updateAvatarEditControlVisibility();
     } catch (error) {
         console.warn('Error updating avatar:', error);
     }
@@ -1071,9 +1578,10 @@ function renderGoalsFull() {
             <span>by ${deadline}</span>
           </div>
           <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-            <input type="number" id="contrib-full-${g.id}" placeholder="Add amount" class="modal-input" style="flex:1;margin-bottom:0;">
+            <label for="contrib-full-${g.id}" style="display:none;">Add contribution amount for ${g.name}</label>
+            <input type="number" id="contrib-full-${g.id}" placeholder="Add amount" class="modal-input" style="flex:1;margin-bottom:0;" aria-label="Add contribution amount for ${g.name}">
             <button onclick="addGoalContribution('${g.id}', 'full')" class="btn-primary" style="padding:10px 16px;">Add</button>
-            <button onclick="deleteGoal('${g.id}')" style="background:none;border:none;color:var(--coral);font-size:18px;cursor:pointer;">x</button>
+            <button onclick="deleteGoal('${g.id}')" style="background:none;border:none;color:var(--coral);font-size:18px;cursor:pointer;" aria-label="Delete goal ${g.name}">x</button>
           </div>
         </div>`;
     }).join('');
@@ -1099,9 +1607,10 @@ function renderGoals() {
             <span>by ${deadline}</span>
           </div>
           <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-            <input type="number" id="contrib-${g.id}" placeholder="Add amount" class="modal-input" style="flex:1;margin-bottom:0;">
+            <label for="contrib-${g.id}" style="display:none;">Add contribution amount for ${g.name}</label>
+            <input type="number" id="contrib-${g.id}" placeholder="Add amount" class="modal-input" style="flex:1;margin-bottom:0;" aria-label="Add contribution amount for ${g.name}">
             <button onclick="addGoalContribution('${g.id}')" class="btn-primary" style="padding:10px 16px;">Add</button>
-            <button onclick="deleteGoal('${g.id}')" style="background:none;border:none;color:var(--coral);font-size:18px;cursor:pointer;">x</button>
+            <button onclick="deleteGoal('${g.id}')" style="background:none;border:none;color:var(--coral);font-size:18px;cursor:pointer;" aria-label="Delete goal ${g.name}">x</button>
           </div>
         </div>`;
     }).join('');
@@ -1188,19 +1697,6 @@ async function saveBudgetInline() {
     }
 }
 
-async function saveUserName() {
-    const name = document.getElementById('settingsName').value.trim();
-    if (name && name !== userName) {
-        userName = name;
-        saveProfile().then(() => {
-            updateGreeting();
-            saveOfflineData();
-            showToast('Name updated');
-            document.getElementById('saveNameBtn').style.display = 'none';
-        });
-    }
-}
-
 async function saveCurrency() {
     const selected = document.getElementById('currencySelect').value;
     const currencyMap = {
@@ -1226,13 +1722,13 @@ async function saveCurrency() {
 
 async function saveTheme() {
     const theme = document.getElementById('themeSelect')?.value || 'dark';
-    
+
     // Apply theme immediately
     applyTheme(theme);
-    
+
     // Save to localStorage for persistence (Supabase theme column will be added later)
     localStorage.setItem('bloom_theme', theme);
-    
+
     showToast(`Theme set to ${theme.charAt(0).toUpperCase() + theme.slice(1)}`);
 }
 
@@ -1274,18 +1770,6 @@ function updateThemeButton() {
     const theme = localStorage.getItem('bloom_theme') || 'system';
     const themeSelect = document.getElementById('themeSelect');
     if (themeSelect) themeSelect.value = theme;
-}
-
-async function saveBudget() {
-    const val = parseFloat(document.getElementById('budgetInput').value);
-    if (!isNaN(val) && val >= 0) {
-        monthlyBudget = val;
-        await saveProfile();
-        update();
-        await saveOfflineData();
-        closeModal(true);
-        showToast('Budget updated');
-    }
 }
 
 // ============================================
@@ -1404,12 +1888,6 @@ function nextCalendarMonth() { calendarDate.setMonth(calendarDate.getMonth() + 1
 // ============================================
 // EXPORT
 // ============================================
-function exportCSV() {
-    let csv = 'ID,Date,Type,Name,Category,Amount\n';
-    transactions.forEach(t => csv += `${t.id},${t.date},${t.type},"${t.name}",${t.category},${t.amount}\n`);
-    downloadFile(csv, 'text/csv', `bloom_data_${Date.now()}.csv`);
-    showToast('CSV exported');
-}
 
 function backupData() {
     downloadFile(JSON.stringify({ transactions, goals, monthlyBudget, userName }, null, 2), 'application/json', `bloom_backup_${Date.now()}.json`);
@@ -1450,7 +1928,7 @@ function importData(e) {
     reader.readAsText(file);
 }
 
-function exportPDF() {
+function exportHTMLReport() {
     const txs = getMonthTx();
     let html = `<html><head><title>Bloom Report</title><style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #2c2416; padding: 20px; }
@@ -1516,27 +1994,73 @@ function closeToast() {
 // MODAL MANAGEMENT
 // ============================================
 function openModal(modalId) {
+    console.log('openModal called with:', modalId);
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
 
-    if (overlay && modal) {
-        // Hide all modals
-        document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    console.log('overlay element:', overlay);
+    console.log('modal element:', modal);
 
-        // Show the requested modal
-        modal.classList.add('active');
-        overlay.classList.add('active');
+    if (!overlay || !modal) {
+        console.error('Modal or overlay not found:', { overlay, modal });
+        return;
+    }
+
+    // Ensure the modal is inside overlay so it centers correctly.
+    if (modal.parentElement !== overlay) {
+        overlay.appendChild(modal);
+    }
+
+    // Hide other modals, show this one.
+    document.querySelectorAll('#modalOverlay .modal').forEach(m => m.classList.remove('active'));
+
+    modal.classList.add('active');
+    overlay.classList.add('active');
+
+    // Keep CSS centering logic from style rules; only force if needed
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+    modal.style.transform = 'translate(-50%, -50%)';
+
+    console.log('Modal opened successfully');
+    console.log('Modal classes:', modal.className);
+    console.log('Overlay classes:', overlay.className);
+    console.log('Modal computed style opacity:', window.getComputedStyle(modal).opacity);
+    console.log('Modal inline style opacity:', modal.style.opacity);
+    console.log('Modal computed style transform:', window.getComputedStyle(modal).transform);
+    console.log('Modal computed style pointer-events:', window.getComputedStyle(modal).pointerEvents);
+
+    // prevent clicks inside the modal from closing overlay
+    modal.addEventListener('click', e => e.stopPropagation());
+
+    // Initialize modal fields if it's the add transaction modal
+    if (modalId === 'addTxModal') {
+        initializeTransactionModal();
+    } else if (modalId === 'subscriptionModal') {
+        initializeSubscriptionModal();
     }
 }
 
 function closeModal(force) {
+    console.log('closeModal called with:', force);
     const overlay = document.getElementById('modalOverlay');
+
+    // Hide suggestions when closing modal
+    const txSuggestionsDiv = document.getElementById('txNameSuggestions');
+    if (txSuggestionsDiv) {
+        txSuggestionsDiv.style.display = 'none';
+    }
+    const subSuggestionsDiv = document.getElementById('subNameSuggestions');
+    if (subSuggestionsDiv) {
+        subSuggestionsDiv.style.display = 'none';
+    }
 
     // Handle different ways to close:
     // 1. force === true: Close from close button (always close)
     // 2. force is Event: Close only if clicking on overlay itself, not modal content
     if (force === true) {
         // Force close from close button
+        console.log('Force closing modal');
         if (overlay) {
             overlay.classList.remove('active');
             document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
@@ -1544,6 +2068,7 @@ function closeModal(force) {
     } else if (force instanceof Event) {
         // Only close if clicked directly on overlay (not on modal or its children)
         if (force.target === overlay) {
+            console.log('Closing modal via overlay click');
             if (overlay) {
                 overlay.classList.remove('active');
                 document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
@@ -1651,7 +2176,7 @@ window.addEventListener('resize', () => {
 
         // Load all data from Supabase with error handling
         try {
-            await Promise.all([loadProfile(), loadTransactions(), loadGoals()]);
+            await Promise.all([loadProfile(), loadTransactions(), loadGoals(), loadSubscriptions()]);
         } catch (dataError) {
             console.warn('Error loading profile data, continuing with empty state:', dataError);
             // Continue with empty state if data loading fails
@@ -1672,6 +2197,8 @@ window.addEventListener('resize', () => {
         setFinancialTip();
         updateCurrencyLabels();
         update();
+        renderSpendingHeatmap();
+        renderSubscriptions();
 
         // Hide loader smoothly
         setTimeout(() => {
@@ -1728,40 +2255,12 @@ function handleProfilePictureUpload(event) {
         return;
     }
 
-    // Read and save image
+    // Read image and open photo editor
     const reader = new FileReader();
-    reader.onload = async function (e) {
+    reader.onload = function (e) {
         const imageData = e.target.result;
-        try {
-            // Keep in-memory avatar variable only, no localStorage
-            userAvatar = imageData;
-            const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-            if (!privacyMode && currentUserId) {
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .update({ profile_picture: imageData })
-                    .eq('id', currentUserId);
-
-                if (error) {
-                    console.error('Error saving profile picture to Supabase:', error);
-                }
-            }
-
-            // Update avatar display
-            updateUserAvatar();
-
-            // Update settings preview
-            const settingsProfilePicture = document.getElementById('settingsProfilePicture');
-            if (settingsProfilePicture) {
-                settingsProfilePicture.style.backgroundImage = `url('${imageData}')`;
-                settingsProfilePicture.textContent = '';
-            }
-
-            showToast('Profile picture updated!');
-        } catch (error) {
-            console.error('Error saving profile picture:', error);
-            showToast('Error saving profile picture');
-        }
+        // Open photo editor with the selected image
+        openPhotoEditOverlay(imageData);
     };
     reader.onerror = function () {
         showToast('Error reading image file');
@@ -1815,6 +2314,227 @@ function initProfilePictureUI() {
     }
 }
 
+// ============================================
+// TRANSACTION AUTOCOMPLETE
+// ============================================
+function initializeTransactionModal() {
+    // Set today's date in the date input
+    const dateInput = document.getElementById('txDate');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+
+    // Clear other fields
+    document.getElementById('txName').value = '';
+    document.getElementById('txAmount').value = '';
+    
+    // Hide suggestions
+    const suggestionsDiv = document.getElementById('txNameSuggestions');
+    if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+
+function initializeSubscriptionModal() {
+    // Set today's date in the start date input
+    const startDateInput = document.getElementById('subStartDate');
+    if (startDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.value = today;
+    }
+
+    // Clear other fields
+    document.getElementById('subName').value = '';
+    document.getElementById('subAmount').value = '';
+    
+    // Hide suggestions
+    const suggestionsDiv = document.getElementById('subNameSuggestions');
+    if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+function initTransactionAutocomplete() {
+    const txNameInput = document.getElementById('txName');
+    const suggestionsDiv = document.getElementById('txNameSuggestions');
+    
+    if (!txNameInput || !suggestionsDiv) return;
+
+    let currentSuggestions = [];
+    let selectedIndex = -1;
+
+    txNameInput.addEventListener('input', function(e) {
+        const value = e.target.value.toLowerCase().trim();
+        if (value.length < 1) {
+            hideSuggestions();
+            return;
+        }
+
+        const suggestions = currentType === 'income' ? INCOME_SUGGESTIONS : EXPENSE_SUGGESTIONS;
+        currentSuggestions = suggestions.filter(s => s.toLowerCase().includes(value));
+        
+        if (currentSuggestions.length > 0) {
+            showSuggestions(currentSuggestions);
+        } else {
+            hideSuggestions();
+        }
+        selectedIndex = -1;
+    });
+
+    txNameInput.addEventListener('keydown', function(e) {
+        if (!suggestionsDiv.style.display || suggestionsDiv.style.display === 'none') return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, currentSuggestions.length - 1);
+            highlightSuggestion(selectedIndex);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, -1);
+            highlightSuggestion(selectedIndex);
+        } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            e.preventDefault();
+            selectSuggestion(currentSuggestions[selectedIndex]);
+        } else if (e.key === 'Escape') {
+            hideSuggestions();
+        }
+    });
+
+    txNameInput.addEventListener('blur', function() {
+        // Delay hiding to allow click on suggestions
+        setTimeout(() => {
+            hideSuggestions();
+        }, 150);
+    });
+
+    function showSuggestions(suggestions) {
+        suggestionsDiv.innerHTML = suggestions.map((s, index) => 
+            `<div class="suggestion-item" data-index="${index}">${s}</div>`
+        ).join('');
+        
+        suggestionsDiv.style.display = 'block';
+        
+        // Add click handlers
+        suggestionsDiv.querySelectorAll('.suggestion-item').forEach((item, index) => {
+            item.addEventListener('click', () => selectSuggestion(suggestions[index]));
+            item.addEventListener('mouseenter', () => {
+                selectedIndex = index;
+                highlightSuggestion(index);
+            });
+        });
+    }
+
+    function hideSuggestions() {
+        suggestionsDiv.style.display = 'none';
+        selectedIndex = -1;
+    }
+
+    function highlightSuggestion(index) {
+        suggestionsDiv.querySelectorAll('.suggestion-item').forEach((item, i) => {
+            item.classList.toggle('highlighted', i === index);
+        });
+    }
+
+    function selectSuggestion(suggestion) {
+        txNameInput.value = suggestion;
+        hideSuggestions();
+        // Focus next input (amount)
+        document.getElementById('txAmount').focus();
+    }
+}
+
+// ============================================
+// SUBSCRIPTION AUTOCOMPLETE
+// ============================================
+function initSubscriptionAutocomplete() {
+    const subNameInput = document.getElementById('subName');
+    const suggestionsDiv = document.getElementById('subNameSuggestions');
+    
+    if (!subNameInput || !suggestionsDiv) return;
+
+    let currentSuggestions = [];
+    let selectedIndex = -1;
+
+    subNameInput.addEventListener('input', function(e) {
+        const value = e.target.value.toLowerCase().trim();
+        if (value.length < 1) {
+            hideSubscriptionSuggestions();
+            return;
+        }
+
+        const suggestions = currentSubType === 'income' ? SUBSCRIPTION_INCOME_SUGGESTIONS : SUBSCRIPTION_EXPENSE_SUGGESTIONS;
+        currentSuggestions = suggestions.filter(s => s.toLowerCase().includes(value));
+        
+        if (currentSuggestions.length > 0) {
+            showSubscriptionSuggestions(currentSuggestions);
+        } else {
+            hideSubscriptionSuggestions();
+        }
+        selectedIndex = -1;
+    });
+
+    subNameInput.addEventListener('keydown', function(e) {
+        if (!suggestionsDiv.style.display || suggestionsDiv.style.display === 'none') return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, currentSuggestions.length - 1);
+            highlightSubscriptionSuggestion(selectedIndex);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, -1);
+            highlightSubscriptionSuggestion(selectedIndex);
+        } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            e.preventDefault();
+            selectSubscriptionSuggestion(currentSuggestions[selectedIndex]);
+        } else if (e.key === 'Escape') {
+            hideSubscriptionSuggestions();
+        }
+    });
+
+    subNameInput.addEventListener('blur', function() {
+        // Delay hiding to allow click on suggestions
+        setTimeout(() => {
+            hideSubscriptionSuggestions();
+        }, 150);
+    });
+
+    function showSubscriptionSuggestions(suggestions) {
+        suggestionsDiv.innerHTML = suggestions.map((s, index) => 
+            `<div class="suggestion-item" data-index="${index}">${s}</div>`
+        ).join('');
+        
+        suggestionsDiv.style.display = 'block';
+        
+        // Add click handlers
+        suggestionsDiv.querySelectorAll('.suggestion-item').forEach((item, index) => {
+            item.addEventListener('click', () => selectSubscriptionSuggestion(suggestions[index]));
+            item.addEventListener('mouseenter', () => {
+                selectedIndex = index;
+                highlightSubscriptionSuggestion(index);
+            });
+        });
+    }
+
+    function hideSubscriptionSuggestions() {
+        suggestionsDiv.style.display = 'none';
+        selectedIndex = -1;
+    }
+
+    function highlightSubscriptionSuggestion(index) {
+        suggestionsDiv.querySelectorAll('.suggestion-item').forEach((item, i) => {
+            item.classList.toggle('highlighted', i === index);
+        });
+    }
+
+    function selectSubscriptionSuggestion(suggestion) {
+        subNameInput.value = suggestion;
+        hideSubscriptionSuggestions();
+        // Focus next input (amount)
+        document.getElementById('subAmount').focus();
+    }
+}
+
 // Call on DOM ready
 document.addEventListener('DOMContentLoaded', function () {
     // Restore sidebar collapsed state
@@ -1831,6 +2551,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (toastClose) {
         toastClose.addEventListener('click', closeToast);
     }
+
+    // Initialize transaction name autocomplete
+    initTransactionAutocomplete();
+
+    // Initialize subscription name autocomplete
+    initSubscriptionAutocomplete();
 });
 
 async function removeProfilePicture() {
@@ -1997,15 +2723,60 @@ let photoEditorState = {
     brightness: 100,
     contrast: 100,
     saturation: 100,
-    isModified: false
+    cropArea: { x: 0, y: 0, width: 0, height: 0 },
+    isModified: false,
+    isDragging: false,
+    dragStart: { x: 0, y: 0 },
+    activeHandle: null
 };
 
-function openPhotoEditOverlay() {
+function openPhotoEditOverlay(imageData = null) {
     const overlay = document.getElementById('photoEditOverlay');
+
+    // If no explicit image is supplied, use the current saved avatar
+    if (!imageData && userAvatar) {
+        imageData = userAvatar;
+    }
+
+    if (!imageData) {
+        showToast('Upload a profile picture first to edit.');
+        return;
+    }
+
     if (overlay) {
         overlay.classList.add('active');
         resetPhotoEditor();
+        initializePhotoEditorWithImage(imageData);
     }
+}
+
+function initializePhotoEditorWithImage(imageData) {
+    const img = new Image();
+    img.onload = function() {
+        // Set up photo editor state
+        photoEditorState.originalImage = imageData;
+        photoEditorState.currentImage = imageData;
+
+        // Set initial crop area to full image
+        photoEditorState.cropArea = {
+            x: 0,
+            y: 0,
+            width: img.width,
+            height: img.height
+        };
+
+        // Update UI
+        document.getElementById('photoPreviewImage').src = imageData;
+
+        // Show preview and controls
+        document.getElementById('previewSection').style.display = 'block';
+        document.getElementById('controlsSection').style.display = 'block';
+        document.getElementById('actionButtons').style.display = 'flex';
+
+        // Initialize crop area
+        initializeCropArea();
+    };
+    img.src = imageData;
 }
 
 function closePhotoEditOverlay() {
@@ -2023,7 +2794,11 @@ function resetPhotoEditor() {
         brightness: 100,
         contrast: 100,
         saturation: 100,
-        isModified: false
+        cropArea: { x: 0, y: 0, width: 0, height: 0 },
+        isModified: false,
+        isDragging: false,
+        dragStart: { x: 0, y: 0 },
+        activeHandle: null
     };
 
     // Hide all sections
@@ -2035,6 +2810,12 @@ function resetPhotoEditor() {
     document.getElementById('brightnessSlider').value = 100;
     document.getElementById('contrastSlider').value = 100;
     document.getElementById('saturationSlider').value = 100;
+
+    // Reset tab to adjust
+    switchPhotoEditTab('adjust');
+
+    // Hide crop overlay
+    document.getElementById('cropOverlay').style.display = 'none';
 
     // Hide status messages
     document.getElementById('loadingState').classList.remove('active');
@@ -2071,6 +2852,22 @@ function handlePhotoUpload(event) {
     reader.onload = function (e) {
         const img = new Image();
         img.onload = function () {
+            // Initialize crop area to full image
+            const containerRect = document.getElementById('photoPreviewImage').parentElement.getBoundingClientRect();
+            const scaleX = containerRect.width / img.width;
+            const scaleY = containerRect.height / img.height;
+            const scale = Math.min(scaleX, scaleY);
+
+            const displayWidth = img.width * scale;
+            const displayHeight = img.height * scale;
+
+            photoEditorState.cropArea = {
+                x: (containerRect.width - displayWidth) / 2,
+                y: (containerRect.height - displayHeight) / 2,
+                width: displayWidth,
+                height: displayHeight
+            };
+
             photoEditorState.originalImage = e.target.result;
             photoEditorState.currentImage = e.target.result;
 
@@ -2122,6 +2919,90 @@ function updateSaturation(value) {
     applyFilters();
 }
 
+// ============================================
+// ENHANCED PHOTO EDITOR FUNCTIONS
+// ============================================
+
+function switchPhotoEditTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.photo-edit-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.photo-edit-tab-content').forEach(content => content.classList.remove('active'));
+
+    // Show selected tab
+    document.querySelector(`[onclick="switchPhotoEditTab('${tabName}')"]`).classList.add('active');
+    document.getElementById(tabName + 'Tab').classList.add('active');
+
+    // Show/hide crop overlay
+    const cropOverlay = document.getElementById('cropOverlay');
+    if (tabName === 'crop') {
+        cropOverlay.style.display = 'block';
+        initializeCropArea();
+    } else {
+        cropOverlay.style.display = 'none';
+    }
+}
+
+function initializeCropArea() {
+    const container = document.querySelector('.photo-preview-wrapper');
+    const containerRect = container.getBoundingClientRect();
+    const img = document.getElementById('photoPreviewImage');
+
+    // Set initial crop area to center square
+    const size = Math.min(containerRect.width, containerRect.height) * 0.8;
+    photoEditorState.cropArea = {
+        x: (containerRect.width - size) / 2,
+        y: (containerRect.height - size) / 2,
+        width: size,
+        height: size
+    };
+
+    updateCropAreaDisplay();
+}
+
+function updateCropAreaDisplay() {
+    const cropArea = document.getElementById('cropArea');
+    const cropOverlay = document.getElementById('cropOverlay');
+
+    cropArea.style.left = photoEditorState.cropArea.x + 'px';
+    cropArea.style.top = photoEditorState.cropArea.y + 'px';
+    cropArea.style.width = photoEditorState.cropArea.width + 'px';
+    cropArea.style.height = photoEditorState.cropArea.height + 'px';
+}
+
+function setCropPreset(preset) {
+    const container = document.querySelector('.photo-preview-wrapper');
+    const containerRect = container.getBoundingClientRect();
+
+    let aspectRatio;
+    switch (preset) {
+        case 'square': aspectRatio = 1; break;
+        case 'portrait': aspectRatio = 3/4; break;
+        case 'landscape': aspectRatio = 4/3; break;
+        case 'wide': aspectRatio = 16/9; break;
+    }
+
+    const size = Math.min(containerRect.width, containerRect.height) * 0.8;
+    let width, height;
+
+    if (aspectRatio > 1) { // landscape
+        width = size;
+        height = size / aspectRatio;
+    } else { // portrait or square
+        height = size;
+        width = size * aspectRatio;
+    }
+
+    photoEditorState.cropArea = {
+        x: (containerRect.width - width) / 2,
+        y: (containerRect.height - height) / 2,
+        width: width,
+        height: height
+    };
+
+    updateCropAreaDisplay();
+    photoEditorState.isModified = true;
+}
+
 function applyFilters() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -2131,12 +3012,37 @@ function applyFilters() {
         canvas.width = img.width;
         canvas.height = img.height;
 
-        // Draw with filters
+        // Apply basic adjustments (brightness/contrast/saturation)
         ctx.filter = `brightness(${photoEditorState.brightness}%) contrast(${photoEditorState.contrast}%) saturate(${photoEditorState.saturation}%)`;
         ctx.drawImage(img, 0, 0);
 
-        // Update preview
-        photoEditorState.currentImage = canvas.toDataURL('image/jpeg', 0.95);
+        let outputCanvas = canvas;
+
+        // Apply crop
+        if (document.getElementById('cropOverlay').style.display !== 'none') {
+            const croppedCanvas = document.createElement('canvas');
+            const croppedCtx = croppedCanvas.getContext('2d');
+
+            const container = document.querySelector('.photo-preview-wrapper');
+            const containerRect = container.getBoundingClientRect();
+            const imgRect = document.getElementById('photoPreviewImage').getBoundingClientRect();
+
+            const scaleX = img.width / imgRect.width;
+            const scaleY = img.height / imgRect.height;
+
+            const cropX = (photoEditorState.cropArea.x - (imgRect.left - containerRect.left)) * scaleX;
+            const cropY = (photoEditorState.cropArea.y - (imgRect.top - containerRect.top)) * scaleY;
+            const cropWidth = photoEditorState.cropArea.width * scaleX;
+            const cropHeight = photoEditorState.cropArea.height * scaleY;
+
+            croppedCanvas.width = cropWidth;
+            croppedCanvas.height = cropHeight;
+            croppedCtx.drawImage(canvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+            outputCanvas = croppedCanvas;
+        }
+
+        photoEditorState.currentImage = outputCanvas.toDataURL('image/jpeg', 0.95);
         document.getElementById('photoPreviewImage').src = photoEditorState.currentImage;
     };
 
@@ -2216,34 +3122,56 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Handle drag and drop for upload area
-    const uploadArea = document.getElementById('uploadArea');
-    if (uploadArea) {
-        uploadArea.addEventListener('dragover', function (e) {
+    // 'Drag to upload' removed; only click-to-upload remains.
+
+    // ============================================
+    // CROP AREA DRAG FUNCTIONALITY
+    // ============================================
+
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let initialCropX = 0;
+    let initialCropY = 0;
+
+    const cropArea = document.getElementById('cropArea');
+    if (cropArea) {
+        cropArea.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            initialCropX = photoEditorState.cropArea.x;
+            initialCropY = photoEditorState.cropArea.y;
             e.preventDefault();
-            e.stopPropagation();
-            this.style.borderColor = 'var(--sage)';
-            this.style.backgroundColor = 'rgba(122, 158, 126, 0.1)';
         });
 
-        uploadArea.addEventListener('dragleave', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.style.borderColor = 'var(--ink-faint)';
-            this.style.backgroundColor = 'var(--warm-white)';
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+
+            const deltaX = e.clientX - dragStartX;
+            const deltaY = e.clientY - dragStartY;
+
+            const container = document.querySelector('.photo-preview-wrapper');
+            if (!container) return;
+
+            const containerRect = container.getBoundingClientRect();
+
+            let newX = initialCropX + deltaX;
+            let newY = initialCropY + deltaY;
+
+            // Constrain to container bounds
+            newX = Math.max(0, Math.min(newX, containerRect.width - photoEditorState.cropArea.width));
+            newY = Math.max(0, Math.min(newY, containerRect.height - photoEditorState.cropArea.height));
+
+            photoEditorState.cropArea.x = newX;
+            photoEditorState.cropArea.y = newY;
+
+            updateCropAreaDisplay();
+            photoEditorState.isModified = true;
         });
 
-        uploadArea.addEventListener('drop', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.style.borderColor = 'var(--ink-faint)';
-            this.style.backgroundColor = 'var(--warm-white)';
-
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('photoUploadInput').files = files;
-                handlePhotoUpload({ target: { files: files } });
-            }
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
         });
     }
 });

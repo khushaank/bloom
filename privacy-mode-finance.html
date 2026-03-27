@@ -364,7 +364,7 @@
           <h2 class="card-title">Set Monthly Budget</h2>
           <p style="color:var(--ink-light);margin-bottom:20px;font-size:14px;">Set a limit for your monthly expenses to keep spending on track.</p>
           <div class="form-group modal-form-group">
-            <label class="modal-label" id="budgetAmountLabel">Budget Amount (₹)</label>
+            <label class="modal-label" for="budgetInputInline" id="budgetAmountLabel">Budget Amount (₹)</label>
             <input type="number" class="modal-input" id="budgetInputInline" placeholder="e.g. 2000" min="0" step="10">
           </div>
           <button class="btn-primary" onclick="saveBudgetInline()">Save Budget</button>
@@ -452,7 +452,7 @@
         <div class="settings-card">
           <h2 class="card-title">Currency</h2>
           <div class="form-group modal-form-group">
-            <label class="modal-label">Display Currency</label>
+            <label class="modal-label" for="currencySelect">Display Currency</label>
             <select class="modal-input" id="currencySelect">
               <option value="₹">₹ Indian Rupee (INR)</option>
               <option value="$">$ US Dollar (USD)</option>
@@ -465,7 +465,7 @@
         <div class="settings-card">
           <h2 class="card-title">Appearance</h2>
           <div class="form-group modal-form-group">
-            <label class="modal-label">Theme</label>
+            <h3 class="modal-label" style="margin-bottom:8px;">Theme</h3>
             <p style="color:var(--ink-light);font-size:13px;margin-bottom:12px;">Choose your preferred color scheme</p>
             <button id="themeToggleBtn" class="btn-secondary" onclick="toggleTheme()" style="width:100%;justify-content:center;gap:8px;">
               <span>🌙</span> Toggle Theme
@@ -498,15 +498,16 @@
         <button class="type-btn" id="btnExpense" onclick="setType('expense')">Expense</button>
       </div>
       <div class="form-group modal-form-group">
-        <label class="modal-label">Description</label>
+        <label class="modal-label" for="txName">Description</label>
         <input type="text" class="modal-input" id="txName" placeholder="e.g. Coffee, Salary…" maxlength="40">
+        <div id="txNameSuggestions" class="suggestions-dropdown" style="display: none;"></div>
       </div>
       <div class="form-group modal-form-group">
-        <label class="modal-label" id="amountLabel">Amount (₹)</label>
+        <label class="modal-label" for="txAmount" id="amountLabel">Amount (₹)</label>
         <input type="number" class="modal-input" id="txAmount" placeholder="0.00" min="0" step="0.01">
       </div>
       <div class="form-group modal-form-group">
-        <label class="modal-label">Category</label>
+        <label class="modal-label" for="txCategory">Category</label>
         <select class="modal-input" id="txCategory">
           <option value="Food & Drink">Food & Drink</option>
           <option value="Transport">Transport</option>
@@ -521,7 +522,7 @@
         </select>
       </div>
       <div class="form-group modal-form-group">
-        <label class="modal-label">Date</label>
+        <label class="modal-label" for="txDate">Date</label>
         <input type="date" class="modal-input" id="txDate">
       </div>
       <button class="btn-primary full-width" onclick="addTransaction()" id="addTxBtn">Add Transaction</button>
@@ -537,15 +538,15 @@
       <div id="addGoalForm"
         style="display:none; background:var(--warm-white); padding:20px; border-radius:12px; margin-bottom:20px;">
         <div class="form-group modal-form-group">
-          <label class="modal-label">Goal Name</label>
+          <label class="modal-label" for="goalName">Goal Name</label>
           <input type="text" class="modal-input" id="goalName" placeholder="e.g. Emergency Fund">
         </div>
         <div class="form-group modal-form-group">
-          <label class="modal-label" id="targetAmountLabel">Target Amount (₹)</label>
+          <label class="modal-label" for="goalTarget" id="targetAmountLabel">Target Amount (₹)</label>
           <input type="number" class="modal-input" id="goalTarget" placeholder="5000" min="1">
         </div>
         <div class="form-group modal-form-group">
-          <label class="modal-label">Deadline</label>
+          <label class="modal-label" for="goalDeadline">Deadline</label>
           <input type="date" class="modal-input" id="goalDeadline">
         </div>
         <div style="display:flex;gap:8px;">
