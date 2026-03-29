@@ -3,10 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Canonical URL -->
-  <link rel="canonical" href="https://bloom.finance/finance-tool.html">
+  <link rel="canonical" href="https://khushaank.github.io/bloom/finance-tool.html">
 
   <title>Bloom — Your Financial Dashboard | Personal Finance Tracker</title>
   <meta name="description"
@@ -28,11 +29,11 @@
 
   <!-- Open Graph / Social -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://bloom.finance/finance-tool.html">
+  <meta property="og:url" content="https://khushaank.github.io/bloom/finance-tool.html">
   <meta property="og:title" content="Bloom — Your Financial Dashboard | Personal Finance Tracker">
   <meta property="og:description"
     content="Track spending, set goals, and build wealth with beautiful charts and insights. Free personal finance management tool.">
-  <meta property="og:image" content="https://bloom.finance/assets/images/logo.png">
+  <meta property="og:image" content="https://khushaank.github.io/bloom/assets/images/logo.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Bloom Financial Dashboard Screenshot">
@@ -44,7 +45,7 @@
   <meta name="twitter:title" content="Bloom — Your Financial Dashboard">
   <meta name="twitter:description"
     content="Track spending, set goals, and build wealth with beautiful charts and insights.">
-  <meta name="twitter:image" content="https://bloom.finance/assets/images/logo.png">
+  <meta name="twitter:image" content="https://khushaank.github.io/bloom/assets/images/logo.png">
   <meta name="twitter:image:alt" content="Bloom Personal Finance Dashboard">
   <meta name="twitter:creator" content="@bloomfinance">
   <meta name="twitter:site" content="@bloomfinance">
@@ -56,9 +57,9 @@
     "@graph": [
       {
         "@type": "WebApplication",
-        "@id": "https://bloom.finance/finance-tool.html#webapplication",
+        "@id": "https://khushaank.github.io/bloom/finance-tool.html#webapplication",
         "name": "Bloom Personal Finance Dashboard",
-        "url": "https://bloom.finance/finance-tool.html",
+        "url": "https://khushaank.github.io/bloom/finance-tool.html",
         "description": "Comprehensive personal finance management dashboard for tracking expenses, creating budgets, setting financial goals, and monitoring wealth building progress.",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web Browser",
@@ -73,7 +74,7 @@
           "Privacy-first design",
           "Beautiful data visualizations"
         ],
-        "screenshot": "https://bloom.finance/assets/images/logo.png",
+        "screenshot": "https://khushaank.github.io/bloom/assets/images/logo.png",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -83,19 +84,19 @@
         "publisher": {
           "@type": "Organization",
           "name": "Bloom Digital Conservatory",
-          "url": "https://bloom.finance/"
+          "url": "https://khushaank.github.io/bloom/"
         }
       },
       {
         "@type": "WebPage",
-        "@id": "https://bloom.finance/finance-tool.html#webpage",
-        "url": "https://bloom.finance/finance-tool.html",
+        "@id": "https://khushaank.github.io/bloom/finance-tool.html#webpage",
+        "url": "https://khushaank.github.io/bloom/finance-tool.html",
         "name": "Bloom — Your Financial Dashboard | Personal Finance Tracker",
         "description": "Access your personal finance dashboard to track spending, manage budgets, and monitor financial goals with beautiful charts and insights.",
         "isPartOf": {
           "@type": "WebSite",
           "name": "Bloom",
-          "url": "https://bloom.finance/"
+          "url": "https://khushaank.github.io/bloom/"
         },
         "datePublished": "2026-03-25",
         "dateModified": "2026-03-25",
@@ -119,7 +120,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
-<body>
+<body class="loading-state">
 
   <script>
     // Redirect privacy mode users to dedicated privacy page
@@ -492,14 +493,6 @@
           <h1 class="page-title">Transaction History</h1>
         </div>
         <div class="greeting-actions">
-          <button class="btn-secondary" onclick="exportCSV()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Export CSV
-          </button>
           <button class="btn-secondary" onclick="exportPDF()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
@@ -539,15 +532,7 @@
           <h1 class="page-title">Subscription Manager</h1>
         </div>
         <div class="greeting-actions">
-          <button class="btn-secondary" onclick="processRecurringTransactions()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10" />
-              <polyline points="1 20 1 14 7 14" />
-              <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
-            </svg>
-            Process Recurring
-          </button>
-          <button class="btn-primary" onclick="console.log('Button clicked'); openSubscriptionModal()">+ Add Subscription</button>
+          <button class="btn-primary" onclick="openSubscriptionModal()">+ Add Subscription</button>
         </div>
       </div>
 
@@ -911,34 +896,7 @@
       <div id="calendarGrid" class="calendar-grid"></div>
     </div>
 
-    <!-- Goals Modal -->
-    <div id="goalsModal" class="modal" style="max-width: 620px;">
-      <div class="modal-header">
-        <h2 class="card-title" style="margin:0">Financial Goals</h2>
-        <button class="modal-close" onclick="closeModal(true)">&times;</button>
-      </div>
-      <button onclick="showAddGoalForm()" class="btn-primary" style="margin-bottom:20px;">+ New Goal</button>
-      <div id="addGoalForm"
-        style="display:none; background:var(--warm-white); padding:20px; border-radius:12px; margin-bottom:20px;">
-        <div class="form-group modal-form-group">
-          <label class="modal-label" for="goalName">Goal Name</label>
-          <input type="text" class="modal-input" id="goalName" placeholder="e.g. Emergency Fund">
-        </div>
-        <div class="form-group modal-form-group">
-          <label class="modal-label" for="goalTarget" id="targetAmountLabel">Target Amount (₹)</label>
-          <input type="number" class="modal-input" id="goalTarget" placeholder="5000" min="1">
-        </div>
-        <div class="form-group modal-form-group">
-          <label class="modal-label" for="goalDeadline">Deadline</label>
-          <input type="date" class="modal-input" id="goalDeadline">
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="addNewGoal()" class="btn-primary">Create Goal</button>
-          <button onclick="hideAddGoalForm()" class="btn-secondary">Cancel</button>
-        </div>
-      </div>
-      <div id="goalsList"></div>
-    </div>
+
 
   </div>
 
@@ -982,43 +940,12 @@
         <div class="photo-controls-section" id="controlsSection" style="display: none;">
           <!-- Tool Tabs -->
           <div class="photo-edit-tabs">
-            <button class="photo-edit-tab active" onclick="switchPhotoEditTab('adjust')">Adjust</button>
-            <button class="photo-edit-tab" onclick="switchPhotoEditTab('crop')">Crop</button>
+            <button class="photo-edit-tab active" onclick="switchPhotoEditTab('crop')">Crop</button>
+            <button class="photo-edit-tab" onclick="switchPhotoEditTab('reposition')">Reposition</button>
           </div>
 
-          <!-- Adjust Tab -->
-          <div class="photo-edit-tab-content active" id="adjustTab">
-            <div class="control-group">
-              <label class="control-label" for="brightnessSlider">
-                <span>Brightness</span>
-                <span class="control-value" id="brightnessValue">100%</span>
-              </label>
-              <input type="range" id="brightnessSlider" class="photo-slider" min="50" max="150" value="100"
-                oninput="updateBrightness(this.value)">
-            </div>
-
-            <div class="control-group">
-              <label class="control-label" for="contrastSlider">
-                <span>Contrast</span>
-                <span class="control-value" id="contrastValue">100%</span>
-              </label>
-              <input type="range" id="contrastSlider" class="photo-slider" min="50" max="150" value="100"
-                oninput="updateContrast(this.value)">
-            </div>
-
-            <div class="control-group">
-              <label class="control-label" for="saturationSlider">
-                <span>Saturation</span>
-                <span class="control-value" id="saturationValue">100%</span>
-              </label>
-              <input type="range" id="saturationSlider" class="photo-slider" min="50" max="150" value="100"
-                oninput="updateSaturation(this.value)">
-            </div>
-          </div>
-
-          <!-- Filters Tab -->
           <!-- Crop Tab -->
-          <div class="photo-edit-tab-content" id="cropTab">
+          <div class="photo-edit-tab-content active" id="cropTab">
             <div class="crop-controls">
               <div class="crop-presets">
                 <button class="crop-preset-btn" onclick="setCropPreset('square')">1:1</button>
@@ -1029,6 +956,20 @@
               <div class="crop-instructions">
                 <p>Drag to move crop area, or use presets above</p>
               </div>
+            </div>
+          </div>
+
+          <!-- Reposition Tab -->
+          <div class="photo-edit-tab-content" id="repositionTab">
+            <div class="reposition-controls" style="padding-top:12px;">
+              <p style="margin-bottom:8px; color:var(--ink-light);">Reposition image within the frame:</p>
+              <div class="reposition-grid" style="display:flex; gap:8px; flex-wrap: wrap;">
+                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(0, -10)">Up</button>
+                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(-10, 0)">Left</button>
+                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(10, 0)">Right</button>
+                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(0, 10)">Down</button>
+              </div>
+              <button class="btn-primary" style="margin-top:8px; width:100%;" onclick="centerImage()">Center Image</button>
             </div>
           </div>
 

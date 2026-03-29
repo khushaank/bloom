@@ -1,3 +1,25 @@
+/* Privacy mode specific styles */
+
+/* Hide financial tip card in privacy mode (removed feature) */
+.tip-card {
+  display: none !important;
+}
+
+/* Optional: strong visual cue for privacy mode */
+body.privacy-mode {
+  background: #f8fbf8;
+}
+
+/* Demo banner style */
+#privacyDemoBanner {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(122, 158, 126, 0.2);
+  background: rgba(168, 197, 172, 0.12);
+  color: #2f5f3a;
+  border-radius: 10px;
+  font-size: 14px;
+}
 /* ============================================
    BLOOM — Personal Finance Tracker
    Professional Dashboard Design System
@@ -97,15 +119,7 @@ body {
 }
 
 /* ensure all page headers default left, avoid right-shifted titles */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.page-title,
-.article-title,
-.error-title {
+h1, h2, h3, h4, h5, h6, .page-title, .article-title, .error-title {
     text-align: left;
 }
 
@@ -262,7 +276,7 @@ h6,
 }
 
 /* Adjust main content margin when sidebar is collapsed */
-.sidebar.collapsed~.main-wrapper {
+.sidebar.collapsed ~ .main-wrapper {
     margin-left: 80px;
 }
 
@@ -797,12 +811,7 @@ h6,
 }
 
 /* enforce left alignment on key page title styles */
-.page-title,
-.article-title,
-.error-title,
-h1,
-h2,
-h3 {
+.page-title, .article-title, .error-title, h1, h2, h3 {
     text-align: left;
 }
 
@@ -969,7 +978,7 @@ h3 {
 }
 
 .summary-card {
-    background: linear-gradient(150deg, rgba(255, 255, 255, 0.95), rgba(244, 251, 247, 0.92));
+    background: linear-gradient(150deg, rgba(255,255,255,0.95), rgba(244,251,247,0.92));
     border-radius: var(--radius-lg);
     padding: 24px;
     box-shadow: 0 10px 28px rgba(50, 70, 68, 0.14);
@@ -1498,7 +1507,7 @@ h3 {
     min-height: 130px;
     color: #334f3b;
     backdrop-filter: blur(6px);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 8px 22px rgba(23, 63, 42, 0.09);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4), 0 8px 22px rgba(23, 63, 42, 0.09);
     position: relative;
     overflow: hidden;
 }
@@ -1825,6 +1834,13 @@ h3 {
 /* ============================================
    MODALS
    ============================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(44, 36, 22, 0.4);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
 
 .tour-overlay {
     position: fixed;
@@ -1916,7 +1932,6 @@ h3 {
         opacity: 0;
         transform: translate(-50%, -48%) scale(0.96);
     }
-
     to {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
@@ -1958,8 +1973,7 @@ h3 {
     opacity: 0;
     pointer-events: none;
     z-index: 1001;
-    color: #000000 !important;
-    /* Force black text */
+    color: #000000 !important; /* Force black text */
 }
 
 .modal.active {
@@ -2406,11 +2420,10 @@ html.light-mode .toast {
 .settings-card {
     transition: border 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .settings-card:hover {
     transform: translateY(-2px);
     border: 1px solid rgba(122, 158, 126, 0.5);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.14);
 }
 
 .settings-card h2.card-title {
@@ -2450,7 +2463,7 @@ html.light-mode .toast {
     right: 0;
     bottom: 0;
     border: none;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0,0,0,0.55);
     border-radius: 50%;
     width: 28px;
     height: 28px;
@@ -2462,7 +2475,7 @@ html.light-mode .toast {
 }
 
 .avatar-edit-btn:hover {
-    background: rgba(77, 122, 82, 0.85);
+    background: rgba(77,122,82,0.85);
 }
 
 .avatar-menu {
@@ -2483,7 +2496,7 @@ html.light-mode .toast {
 
 .avatar-menu-btn {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255,255,255,0.2);
     color: #fff;
     padding: 6px 8px;
     border-radius: 8px;
@@ -2492,7 +2505,7 @@ html.light-mode .toast {
 }
 
 .avatar-menu-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255,255,255,0.08);
 }
 
 
@@ -2580,19 +2593,16 @@ html.light-mode .toast {
     .settings-grid {
         grid-template-columns: 1fr;
     }
-
     .account-header {
         flex-direction: column;
         align-items: flex-start;
     }
-
     .profile-picture-preview.large {
         width: 80px !important;
         height: 80px !important;
         min-width: 80px;
         font-size: 34px;
     }
-
     .account-header-info {
         width: 100%;
         gap: 8px;
@@ -2603,32 +2613,23 @@ html.light-mode .toast {
     .settings-card {
         padding: 18px;
     }
-
     .account-name {
         font-size: 18px;
     }
-
     .account-email {
         font-size: 13px;
         word-break: break-word;
     }
-
-    .btn-primary,
-    .btn-secondary {
+    .btn-primary, .btn-secondary {
         width: 100%;
     }
-
     .profile-picture-buttons {
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
-
-    .hero,
-    .features,
-    .settings,
-    .cta,
-    .footer {
+    .hero, .features, .settings,
+    .cta, .footer {
         padding-left: 12px;
         padding-right: 12px;
     }
@@ -2901,8 +2902,7 @@ button:focus-visible {
 /* SMOOTH TRANSITIONS */
 .modal.active {
     opacity: 1 !important;
-    animation: none;
-    /* Temporarily disable animation */
+    animation: none; /* Temporarily disable animation */
 }
 
 @keyframes fadeInScale {
@@ -3087,12 +3087,12 @@ select:focus {
     padding: 32px;
     width: 100%;
     max-width: 480px;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-    border: 1px solid rgba(44, 36, 22, 0.08);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(44, 36, 22, 0.08);
 }
 
 .photo-preview-wrapper {
@@ -3108,10 +3108,6 @@ select:focus {
     max-height: 100%;
     object-fit: contain;
     transition: transform 0.2s ease;
-}
-
-.photo-edit-overlay.active .photo-edit-container {
-    transform: translateY(0);
 }
 
 /* Responsive behavior for photo editor */
@@ -3143,9 +3139,7 @@ select:focus {
         max-height: 220px;
     }
 
-    .photo-edit-controls,
-    .photo-preview-section,
-    .photo-controls-section {
+    .photo-edit-controls, .photo-preview-section, .photo-controls-section {
         width: 100%;
     }
 }
@@ -3276,29 +3270,10 @@ select:focus {
     cursor: nw-resize;
 }
 
-.crop-handle.nw {
-    top: -6px;
-    left: -6px;
-    cursor: nw-resize;
-}
-
-.crop-handle.ne {
-    top: -6px;
-    right: -6px;
-    cursor: ne-resize;
-}
-
-.crop-handle.sw {
-    bottom: -6px;
-    left: -6px;
-    cursor: sw-resize;
-}
-
-.crop-handle.se {
-    bottom: -6px;
-    right: -6px;
-    cursor: se-resize;
-}
+.crop-handle.nw { top: -6px; left: -6px; cursor: nw-resize; }
+.crop-handle.ne { top: -6px; right: -6px; cursor: ne-resize; }
+.crop-handle.sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+.crop-handle.se { bottom: -6px; right: -6px; cursor: se-resize; }
 
 /* Filter Buttons */
 .filter-buttons {
@@ -3675,7 +3650,7 @@ select:focus {
    SPENDING HEATMAP
    ============================================ */
 .heatmap-card {
-    background: linear-gradient(155deg, rgba(255, 255, 255, 0.9), rgba(238, 248, 241, 0.95));
+    background: linear-gradient(155deg, rgba(255,255,255,0.9), rgba(238,248,241,0.95));
     border-radius: var(--radius-lg);
     padding: 26px;
     box-shadow: 0 14px 36px rgba(50, 73, 65, 0.16);
@@ -3696,25 +3671,11 @@ select:focus {
     border-color: rgba(55, 134, 98, 0.45);
 }
 
-.intensity-0 {
-    background: #fafdfb;
-}
-
-.intensity-1 {
-    background: #dff8e7;
-}
-
-.intensity-2 {
-    background: #b5e6c7;
-}
-
-.intensity-3 {
-    background: #7ac69f;
-}
-
-.intensity-4 {
-    background: #3f9b70;
-}
+.intensity-0 { background: #fafdfb; }
+.intensity-1 { background: #dff8e7; }
+.intensity-2 { background: #b5e6c7; }
+.intensity-3 { background: #7ac69f; }
+.intensity-4 { background: #3f9b70; }
 
 .heatmap-title {
     font-family: 'Playfair Display', serif;
@@ -3799,25 +3760,11 @@ select:focus {
     border-radius: 3px;
 }
 
-.intensity-0 {
-    background: var(--cream);
-}
-
-.intensity-1 {
-    background: #e8f4f0;
-}
-
-.intensity-2 {
-    background: var(--sage-light);
-}
-
-.intensity-3 {
-    background: var(--sage);
-}
-
-.intensity-4 {
-    background: var(--sage-dark);
-}
+.intensity-0 { background: var(--cream); }
+.intensity-1 { background: #e8f4f0; }
+.intensity-2 { background: var(--sage-light); }
+.intensity-3 { background: var(--sage); }
+.intensity-4 { background: var(--sage-dark); }
 
 /* ============================================
    SUBSCRIPTIONS
@@ -4236,7 +4183,6 @@ select:focus {
 }
 
 @media (max-width: 800px) {
-
     .sidebar,
     .sidebar-collapsed {
         position: fixed;
@@ -4369,9 +4315,3 @@ select:focus {
 .photo-edit-wrapper:hover .photo-overlay {
     opacity: 1;
 }
-/* --- SKELETON LOADING --- */
-body.loading-state .stat-amount, body.loading-state .stat-change, body.loading-state .tx-list, body.loading-state .donut-center, body.loading-state #donutSegments, body.loading-state #chartLegend, body.loading-state #spendingCanvas, body.loading-state .chart-meta-val { position: relative; overflow: hidden; color: transparent !important; background: transparent !important; border-color: transparent !important; pointer-events: none; }
-body.loading-state .stat-amount::after, body.loading-state .stat-change::after, body.loading-state .tx-list::after, body.loading-state .donut-center::after, body.loading-state #donutSegments::after, body.loading-state #chartLegend::after, body.loading-state #spendingCanvas::after, body.loading-state .chart-meta-val::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 8px; background: linear-gradient(90deg, #f0ebe3 25%, #e6dfd3 50%, #f0ebe3 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s infinite linear; z-index: 10; }
-@keyframes skeleton-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-body.loading-state #globalLoader { display: none !important; }
-

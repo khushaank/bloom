@@ -14,6 +14,7 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/login.css">
+  <link rel="stylesheet" href="assets/css/privacy-mode.css">
   <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
 </head>
 
@@ -145,34 +146,7 @@
     </div>
   </div>
 
-  <script>
-    function enterPrivacyMode() {
-      try {
-        // Set privacy mode flag (do NOT set offline_mode, that's for authenticated users)
-        localStorage.setItem('bloom_privacy_mode', 'true');
-        localStorage.setItem('bloom_session_id', 'privacy_' + Date.now());
-        
-        // Initialize empty data if not exists
-        if (!localStorage.getItem('bloom_privacy_data')) {
-          localStorage.setItem('bloom_privacy_data', JSON.stringify({
-            transactions: [],
-            goals: [],
-            monthlyBudget: 2000,
-            currencySymbol: '₹',
-            createdAt: new Date().toISOString()
-          }));
-        }
-        
-        // Redirect after a short delay to ensure localStorage is synced
-        setTimeout(() => {
-          window.location.href = 'privacy-mode-finance.html';
-        }, 100);
-      } catch (error) {
-        console.error('Error entering privacy mode:', error);
-        alert('Unable to enter privacy mode. Please check your browser storage.');
-      }
-    }
-  </script>
+  <script src="assets/js/privacy-mode-bundle.js" defer></script>
 </body>
 
 </html>

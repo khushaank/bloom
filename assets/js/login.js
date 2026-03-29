@@ -79,7 +79,7 @@ function enterOfflineMode(e) {
             window.location.href = 'finance-tool.html';
         }, 100);
     } catch (error) {
-        console.error('Error entering offline mode:', error);
+        
         alert('Unable to enter offline mode. Please check your browser storage.');
     }
     return false;
@@ -126,6 +126,11 @@ async function handleLogin(e) {
         document.getElementById('loginError').textContent = error.message;
         return;
     }
+
+    // Ensure regular (non-privacy) mode after a successful login
+    localStorage.removeItem('bloom_privacy_mode');
+    localStorage.removeItem('bloom_session_id');
+    localStorage.removeItem('bloom_privacy_data');
 
     window.location.href = 'finance-tool.html';
 }
@@ -176,6 +181,11 @@ async function handleSignup(e) {
         document.getElementById('signupError').textContent = 'An account with this email already exists.';
         return;
     }
+
+    // Ensure regular (non-privacy) mode for new created accounts
+    localStorage.removeItem('bloom_privacy_mode');
+    localStorage.removeItem('bloom_session_id');
+    localStorage.removeItem('bloom_privacy_data');
 
     // Show confirmation message
     document.getElementById('confirmEmail').textContent = email;
