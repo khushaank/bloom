@@ -1,3 +1,335 @@
+// ================================
+// Privacy Mode initialization
+// ================================
+
+const PRIVACY_DEMO_TRANSACTIONS = [
+    { id: 'demo-1', name: 'Coffee', amount: -80, category: 'Food & Drink', type: 'expense', date: new Date().toISOString() },
+    { id: 'demo-2', name: 'Salary', amount: 50000, category: 'Salary', type: 'income', date: new Date().toISOString() },
+    { id: 'demo-3', name: 'Groceries', amount: -1700, category: 'Shopping', type: 'expense', date: new Date().toISOString() },
+    { id: 'demo-4', name: 'Electricity Bill', amount: -1250, category: 'Housing', type: 'expense', date: new Date().toISOString() }
+];
+
+const PRIVACY_DEMO_GOALS = [
+    { id: 'goal-demo-1', name: 'Emergency Fund', target: 20000, saved: 7000, deadline: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().slice(0, 10), status: 'In progress' }
+];
+
+const PRIVACY_DEFAULT_DATA = {
+    transactions: [],
+    goals: [],
+    monthlyBudget: 2000,
+    currencySymbol: '₹',
+    createdAt: new Date().toISOString()
+};
+
+function setPrivacyData(data) {
+    localStorage.setItem('bloom_privacy_data', JSON.stringify(data));
+}
+
+function getPrivacyData() {
+    try {
+        return JSON.parse(localStorage.getItem('bloom_privacy_data') || '{}');
+    } catch (e) {
+        return {};
+    }
+}
+
+function seedPrivacyData(useDemo = false) {
+    if (useDemo) {
+        setPrivacyData({
+            transactions: PRIVACY_DEMO_TRANSACTIONS,
+            goals: PRIVACY_DEMO_GOALS,
+            monthlyBudget: 2000,
+            currencySymbol: '₹',
+            createdAt: new Date().toISOString()
+        });
+    } else {
+        setPrivacyData(PRIVACY_DEFAULT_DATA);
+    }
+}
+
+function initializePrivacyMode() {
+    document.body.classList.add('privacy-mode');
+}
+
+function enterPrivacyMode() {
+    try {
+        localStorage.setItem('bloom_privacy_mode', 'true');
+        localStorage.setItem('bloom_session_id', 'privacy_' + Date.now());
+
+        if (!localStorage.getItem('bloom_privacy_data')) {
+            seedPrivacyData(false);
+        }
+
+        setTimeout(() => {
+            window.location.href = 'privacy-mode-finance.html';
+        }, 100);
+    } catch (error) {
+        
+        alert('Unable to enter privacy mode. Please check browser storage.');
+    }
+}
+
+// Initialize page class for style application
+initializePrivacyMode();
+// ============================================
+// BLOOM — Onboarding / Sample Data Tour
+// ============================================
+
+const SAMPLE_TX = [
+    { name: 'Monthly Salary', amount: 4200, category: 'Salary', type: 'income' },
+    { name: 'Apartment Rent', amount: 1400, category: 'Housing', type: 'expense' },
+    { name: 'Whole Foods Market', amount: 142.50, category: 'Food & Drink', type: 'expense' },
+    { name: 'Netflix', amount: 15, category: 'Entertainment', type: 'expense' },
+    { name: 'Metro Pass', amount: 90, category: 'Transport', type: 'expense' }
+];
+
+const SAMPLE_GOALS = [
+    { name: 'Rainy Day Fund', target: 5000, current: 1500, deadline: '2026-12-31' },
+    { name: 'Euro Trip', target: 3000, current: 600, deadline: '2027-06-30' }
+];
+
+async function checkAndApplySamples() {
+    const privacyModeOn = localStorage.getItem('bloom_privacy_mode') === 'true';
+    const samplesRemoved = localStorage.getItem(`bloom_samples_removed_${currentUserId}`);
+    if (samplesRemoved === 'true') return;
+    if (privacyModeOn) {
+        return;
+    }
+
+    // For regular users, show tour button once on an empty account
+    if (!privacyModeOn && transactions.length === 0 && goals.length === 0) {
+        showTourButton();
+    }
+}
+
+function showTourButton() {
+    const btnHtml = `
+      <div id="tourFloatingBtn" style="position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:12px;animation: fadeInUp 0.5s ease;">
+         <button onclick="loadSampleData()" class="btn-primary" style="box-shadow: 0 4px 16px rgba(77,122,82,0.4);padding:14px 20px;">
+           ✨ View Sample Data Tour
+         </button>
+         <button onclick="removeSampleDataPrompt()" class="btn-secondary" style="background:#fff;">
+           Clear Demo & Stop Tour
+         </button>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', btnHtml);
+}
+
+async function loadSampleData() {
+    const btn = document.getElementById('tourFloatingBtn');
+    if (btn) btn.innerHTML = '<span style="background:var(--card-bg);padding:12px;border-radius:8px;font-size:13px;box-shadow:var(--shadow);">Generatating...</span>';
+
+    // Insert locally only! Temporary samples.
+    const today = new Date().toISOString().split('T')[0];
+
+    // Check if we already have samples loaded
+    if (transactions.some(t => t.id && t.id.toString().startsWith('sample_'))) return;
+
+    SAMPLE_TX.forEach((tx, idx) => {
+        transactions.push({
+            ...tx,
+            id: `sample_tx_${idx}`,
+            date: today
+        });
+    });
+
+    SAMPLE_GOALS.forEach((g, idx) => {
+        goals.push({
+            ...g,
+            id: `sample_goal_${idx}`
+        });
+    });
+
+    update();
+    showToast('Demo data loaded successfully!');
+
+    if (btn) {
+        btn.innerHTML = `
+          <button onclick="removeSampleDataPrompt()" class="btn-secondary" style="background:#fff;border-color:var(--coral);color:var(--coral);">
+            Clear Demo Data
+          </button>
+        `;
+    }
+}
+
+async function removeSampleDataPrompt() {
+    localStorage.setItem(`bloom_samples_removed_${currentUserId}`, 'true');
+    const btn = document.getElementById('tourFloatingBtn');
+    if (btn) btn.remove();
+
+    // Strip sample items only!
+    transactions = transactions.filter(t => !(t.id && t.id.toString().startsWith('sample_')));
+    goals = goals.filter(g => !(g.id && g.id.toString().startsWith('sample_')));
+
+    update();
+    showToast('Tour disabled. You have full control!');
+}
+
+// Onboarding overlays
+function createOverlayTooltip() {
+    const existing = document.getElementById('tourOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'tourOverlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.right = '0';
+    overlay.style.bottom = '0';
+    overlay.style.background = 'rgba(0, 0, 0, 0.55)';
+    overlay.style.zIndex = '10050';
+    overlay.style.pointerEvents = 'auto';
+
+    const card = document.createElement('div');
+    card.id = 'tourOverlayCard';
+    card.style.position = 'absolute';
+    card.style.maxWidth = '320px';
+    card.style.background = 'white';
+    card.style.borderRadius = '12px';
+    card.style.padding = '16px';
+    card.style.boxShadow = '0 20px 45px rgba(0, 0, 0, 0.30)';
+    card.style.color = '#1f3121';
+    card.style.fontFamily = 'Inter, sans-serif';
+    card.style.lineHeight = '1.4';
+
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+    return { overlay, card };
+}
+
+let currentTourTarget = null;
+
+function removeOverlayTooltip() {
+    const existing = document.getElementById('tourOverlay');
+    if (existing) existing.remove();
+    const existingControls = document.getElementById('tourControls');
+    if (existingControls) existingControls.remove();
+    if (currentTourTarget) {
+        currentTourTarget.classList.remove('tour-highlight');
+        currentTourTarget = null;
+    }
+}
+
+function createTourControls() {
+    const existing = document.getElementById('tourControls');
+    if (existing) existing.remove();
+
+    const controls = document.createElement('div');
+    controls.id = 'tourControls';
+    controls.className = 'tour-controls';
+    controls.innerHTML = `
+        <button id="tourSkipBtn" style="background:#f3f4f6;color:#485058;">Skip Tour</button>
+    `;
+
+    document.body.appendChild(controls);
+    return controls;
+}
+
+const PRIVACY_TOUR_STEPS = [
+    {
+        selector: '.greeting-actions .btn-primary',
+        title: 'Add Transaction',
+        text: 'Click here to record new income or expense entries quickly.',
+    },
+    {
+        selector: '#spendingHeatmap',
+        title: 'Spending Heatmap',
+        text: 'Monitor your daily spending intensity with this heatmap view.',
+    }
+];
+
+let privacyTourIndex = 0;
+
+function showPrivacyTourStep(index) {
+    const step = PRIVACY_TOUR_STEPS[index];
+    if (!step) {
+        removeOverlayTooltip();
+        localStorage.setItem(`bloom_privacy_tour_completed_${currentUserId}`, 'true');
+        return;
+    }
+
+    // Auto-switch pages if declared in step (optional)
+    if (step.section && typeof switchSection === 'function') {
+        switchSection(step.section, document.querySelector(`.sidebar-nav .nav-item[data-section="${step.section}"]`));
+    }
+
+    // Ensure the section exists before selecting target element
+    const target = document.querySelector(step.selector) || document.querySelector(`.sidebar-nav .nav-item[data-section="${step.section}"]`);
+
+    if (target && typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    }
+
+    const { overlay, card } = createOverlayTooltip();
+    const rect = target ? target.getBoundingClientRect() : { x: 40, y: 80, width: 240, height: 42 };
+
+    if (currentTourTarget) {
+        currentTourTarget.classList.remove('tour-highlight');
+    }
+    if (target) {
+        target.classList.add('tour-highlight');
+        currentTourTarget = target;
+    }
+
+    const isLastStep = index === PRIVACY_TOUR_STEPS.length - 1;
+
+    card.innerHTML = `
+      <h3 style="margin:0 0 8px; font-size:16px; font-weight:700; color:#2a472a;">${step.title}</h3>
+      <p style="margin:0 0 12px; font-size:14px; color:#314033;">${step.text}</p>
+      <button id="tourNextBtn" style="border:none;background:#4a7a55;color:white;cursor:pointer;padding:8px 10px;border-radius:8px;">${isLastStep ? 'End Tour' : 'Next'}</button>
+    `;
+
+    const top = Math.max(16, rect.top + window.scrollY + rect.height + 12);
+    const left = Math.max(16, rect.left + window.scrollX);
+    card.style.top = `${top}px`;
+    card.style.left = `${left}px`;
+
+    createTourControls();
+    const skip = document.getElementById('tourSkipBtn');
+    const next = document.getElementById('tourNextBtn');
+
+    skip.addEventListener('click', () => {
+        removeOverlayTooltip();
+        localStorage.setItem(`bloom_privacy_tour_completed_${currentUserId}`, 'true');
+    });
+    next.addEventListener('click', () => {
+        if (isLastStep) {
+            removeOverlayTooltip();
+            localStorage.setItem(`bloom_privacy_tour_completed_${currentUserId}`, 'true');
+            return;
+        }
+        privacyTourIndex = index + 1;
+        showPrivacyTourStep(privacyTourIndex);
+    });
+}
+
+function startPrivacyTour() {
+    if (localStorage.getItem(`bloom_privacy_tour_completed_${currentUserId}`) === 'true') return;
+    setTimeout(() => {
+        showPrivacyTourStep(0);
+    }, 800);
+}
+
+function removeDemoDataForever() {
+    localStorage.setItem(`bloom_samples_removed_${currentUserId}`, 'true');
+    localStorage.removeItem(`bloom_samples_auto_loaded_${currentUserId}`);
+    transactions = transactions.filter(t => !(t.id && t.id.toString().startsWith('sample_')));
+    goals = goals.filter(g => !(g.id && g.id.toString().startsWith('sample_')));
+    saveOfflineData();
+    update();
+}
+
+// Hook into existing init and run after the initial data load finish.
+setTimeout(() => {
+    if (currentUserId) {
+        checkAndApplySamples();
+        if (localStorage.getItem('bloom_privacy_mode') === 'true') {
+            startPrivacyTour();
+        }
+    }
+}, 2000); // give time for script.js to load data
 // ============================================
 // BLOOM — Personal Finance Tracker
 // ============================================
@@ -120,7 +452,6 @@ async function loadProfile() {
             .maybeSingle();
 
         if (error) {
-
             // Set defaults and continue
             userName = extractNameFromEmail(userEmail) || 'User';
             return;
@@ -128,7 +459,6 @@ async function loadProfile() {
 
         if (!data) {
             // No profile exists yet - this is normal for new users
-
             userName = extractNameFromEmail(userEmail) || 'User';
             return;
         }
@@ -158,7 +488,6 @@ async function loadProfile() {
         // Load profile picture if available (profile_picture is the column currently in schema)
         userAvatar = data.profile_picture || null;
     } catch (err) {
-
         // Ensure app still works with defaults
         userName = extractNameFromEmail(userEmail) || 'User';
     }
@@ -173,7 +502,6 @@ async function loadTransactions() {
             .order('transaction_date', { ascending: false });
 
         if (error) {
-
             transactions = [];
             return;
         }
@@ -191,7 +519,6 @@ async function loadTransactions() {
             }));
         }
     } catch (err) {
-
         transactions = [];
     }
 }
@@ -206,7 +533,6 @@ async function loadSubscriptions() {
             .order('transaction_date', { ascending: false });
 
         if (error) {
-
             subscriptions = [];
             return;
         }
@@ -223,7 +549,6 @@ async function loadSubscriptions() {
             }));
         }
     } catch (err) {
-
         subscriptions = [];
     }
 }
@@ -237,7 +562,6 @@ async function loadGoals() {
             .order('created_at', { ascending: false });
 
         if (error) {
-
             goals = [];
             return;
         }
@@ -253,7 +577,6 @@ async function loadGoals() {
             }));
         }
     } catch (err) {
-
         goals = [];
     }
 }
@@ -499,10 +822,7 @@ function renderSpendingHeatmap() {
 let currentSubType = 'expense';
 
 function openSubscriptionModal() {
-
-
     resetSubscriptionForm();
-
     openModal('subscriptionModal');
 }
 
@@ -530,7 +850,6 @@ async function addSubscription() {
         recurring_frequency: frequency
     };
 
-
     setLoading(btn, true);
 
     try {
@@ -539,11 +858,9 @@ async function addSubscription() {
             .insert([newSub]);
 
 
-
         setLoading(btn, false);
 
         if (error) {
-
             showToast('Error saving subscription: ' + error.message);
         } else {
             showToast('Subscription added!');
@@ -553,7 +870,6 @@ async function addSubscription() {
             renderSubscriptions();
         }
     } catch (err) {
-
         setLoading(btn, false);
         showToast('Error: ' + err.message);
     }
@@ -662,13 +978,10 @@ async function saveProfile() {
             .select();
 
         if (error) {
-
             showToast('Error saving profile');
         } else {
-
         }
     } catch (err) {
-
         showToast('Error saving profile');
     }
 }
@@ -895,8 +1208,16 @@ function switchSection(section, el) {
 
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
-    sidebar.classList.remove('open');
-    overlay.classList.remove('active');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+
+    // Keep URL sync in privacy mode and prevent location jump via href="#"
+    if (section) {
+        const newHash = '#' + section;
+        if (window.location.hash !== newHash) {
+            history.replaceState(null, '', newHash);
+        }
+    }
 
     if (section === 'transactions') renderFullTxList();
     if (section === 'goals') renderGoalsFull();
@@ -975,12 +1296,6 @@ document.addEventListener('click', (e) => {
 
 async function handleLogout() {
     await supabaseClient.auth.signOut();
-
-    // clear privacy mode flags when regular user logs out
-    localStorage.removeItem('bloom_privacy_mode');
-    localStorage.removeItem('bloom_session_id');
-    localStorage.removeItem('bloom_privacy_data');
-
     window.location.href = 'login.html';
 }
 
@@ -1197,7 +1512,6 @@ function setUserAvatar(element, email, name) {
         element.style.color = 'inherit';
         element.style.backgroundImage = 'none';
     } catch (error) {
-
         element.textContent = getInitials(name);
     }
 }
@@ -1243,7 +1557,6 @@ function updateUserAvatar() {
 
         updateAvatarEditControlVisibility();
     } catch (error) {
-
     }
 }
 
@@ -1280,7 +1593,6 @@ function updateGreeting() {
         // Update avatar
         updateUserAvatar();
     } catch (error) {
-
     }
 }
 
@@ -1417,7 +1729,6 @@ function renderChart(txs) {
             return `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div><span class="legend-name">${cat}</span><span class="legend-pct">${pct}%</span></div>`;
         }).join('');
     } catch (error) {
-
     }
 }
 
@@ -2000,15 +2311,11 @@ function closeToast() {
 // MODAL MANAGEMENT
 // ============================================
 function openModal(modalId) {
-
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
 
 
-
-
     if (!overlay || !modal) {
-
         return;
     }
 
@@ -2028,6 +2335,7 @@ function openModal(modalId) {
     modal.style.pointerEvents = 'auto';
     modal.style.transform = 'translate(-50%, -50%)';
 
+
     // prevent clicks inside the modal from closing overlay
     modal.addEventListener('click', e => e.stopPropagation());
 
@@ -2040,7 +2348,6 @@ function openModal(modalId) {
 }
 
 function closeModal(force) {
-
     const overlay = document.getElementById('modalOverlay');
 
     // Hide suggestions when closing modal
@@ -2058,7 +2365,6 @@ function closeModal(force) {
     // 2. force is Event: Close only if clicking on overlay itself, not modal content
     if (force === true) {
         // Force close from close button
-
         if (overlay) {
             overlay.classList.remove('active');
             document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
@@ -2066,7 +2372,6 @@ function closeModal(force) {
     } else if (force instanceof Event) {
         // Only close if clicked directly on overlay (not on modal or its children)
         if (force.target === overlay) {
-
             if (overlay) {
                 overlay.classList.remove('active');
                 document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
@@ -2138,50 +2443,51 @@ window.addEventListener('resize', () => {
         applyTheme(theme);
         updateThemeButton();
 
-        // Check for Privacy Mode first (completely separate from auth)
+        // Enforce Privacy Mode on this page only
         const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-        if (privacyMode) {
-            // Load from localStorage (Privacy Mode - no Supabase)
-            const privacyData = JSON.parse(localStorage.getItem('bloom_privacy_data') || '{}');
-            transactions = privacyData.transactions || [];
-            goals = privacyData.goals || [];
-            userName = 'You (Private)';
-            monthlyBudget = privacyData.monthlyBudget || 2000;
-            currencySymbol = privacyData.currencySymbol || '₹';
-            const currencyMap = {
-                '₹': { code: 'INR', locale: 'en-IN' },
-                '$': { code: 'USD', locale: 'en-US' },
-                '€': { code: 'EUR', locale: 'en-DE' },
-                '£': { code: 'GBP', locale: 'en-GB' }
-            };
-            const currData = currencyMap[currencySymbol] || { code: 'INR', locale: 'en-IN' };
-            currencyCode = currData.code;
-            numberFormat = currData.locale;
-            currentUserId = localStorage.getItem('bloom_session_id');
-            userEmail = '';
-
-            updateGreeting();
-            updateCurrencyLabels();
-            update();
-
-            showToast('Running in Privacy Mode - no data synced');
-
-            // Hide loader
-            setTimeout(() => {
-                const loader = document.getElementById('globalLoader');
-                if (loader) {
-                    document.body.classList.remove('loading-state');
-                    loader.classList.add('hidden');
-                    setTimeout(() => loader.remove(), 500);
-                }
-            }, 300);
+        if (!privacyMode) {
+            window.location.href = 'finance-tool.html';
             return;
         }
 
-        // Regular Authentication Flow (Supabase)
-        const user = await requireAuth();
-        if (!user) {
+        // Load from localStorage (Privacy Mode - no Supabase)
+        const privacyData = JSON.parse(localStorage.getItem('bloom_privacy_data') || '{}');
+        transactions = privacyData.transactions || [];
+        goals = privacyData.goals || [];
+        userName = 'User';
+        monthlyBudget = privacyData.monthlyBudget || 2000;
+        currencySymbol = privacyData.currencySymbol || '₹';
+        const currencyMap = {
+            '₹': { code: 'INR', locale: 'en-IN' },
+            '$': { code: 'USD', locale: 'en-US' },
+            '€': { code: 'EUR', locale: 'en-DE' },
+            '£': { code: 'GBP', locale: 'en-GB' }
+        };
+        const currData = currencyMap[currencySymbol] || { code: 'INR', locale: 'en-IN' };
+        currencyCode = currData.code;
+        numberFormat = currData.locale;
+        currentUserId = localStorage.getItem('bloom_session_id');
+        userEmail = '';
 
+        updateGreeting();
+        updateCurrencyLabels();
+        update();
+
+        showToast('Running in Privacy Mode - no data synced');
+
+        // Hide loader
+        setTimeout(() => {
+            const loader = document.getElementById('globalLoader');
+            if (loader) {
+                document.body.classList.remove('loading-state');
+            loader.classList.add('hidden');
+                setTimeout(() => loader.remove(), 500);
+            }
+        }, 300);
+
+        return;
+
+        if (!user) {
             return;
         }
 
@@ -2192,7 +2498,6 @@ window.addEventListener('resize', () => {
         try {
             await Promise.all([loadProfile(), loadTransactions(), loadGoals(), loadSubscriptions()]);
         } catch (dataError) {
-
             // Continue with empty state if data loading fails
         }
 
@@ -2219,12 +2524,11 @@ window.addEventListener('resize', () => {
             const loader = document.getElementById('globalLoader');
             if (loader) {
                 document.body.classList.remove('loading-state');
-                loader.classList.add('hidden');
+            loader.classList.add('hidden');
                 setTimeout(() => loader.remove(), 500);
             }
         }, 300);
     } catch (error) {
-
         showToast('Error loading app. Please refresh the page.');
         // Hide loader on error
         const loader = document.getElementById('globalLoader');
@@ -2245,6 +2549,17 @@ window.addEventListener('resize', () => {
             switchSection(section, navEl);
         }
     }
+
+    // Link click handlers in sidebar nav for privacy mode
+    document.querySelectorAll('.sidebar-nav .nav-item').forEach(navItem => {
+        navItem.addEventListener('click', e => {
+            e.preventDefault();
+            const section = navItem.dataset.section;
+            if (section) {
+                switchSection(section, navItem);
+            }
+        });
+    });
 
     window.addEventListener('hashchange', openHashSection);
     openHashSection();
@@ -2326,7 +2641,6 @@ function initProfilePictureUI() {
             }
         }
     } catch (error) {
-
     }
 }
 
@@ -2594,7 +2908,6 @@ async function removeProfilePicture() {
 
         showToast('Profile picture removed');
     } catch (error) {
-
         showToast('Error removing profile picture');
     }
 }
@@ -2628,7 +2941,6 @@ function initializeSettingsFields() {
             settingsBudget.value = monthlyBudget || 2000;
         }
     } catch (error) {
-
     }
 }
 
@@ -2661,7 +2973,6 @@ async function saveUserName() {
                 .eq('id', currentUserId);
 
             if (error) {
-
                 showToast('Error saving name. Please try again.');
                 return;
             }
@@ -2679,7 +2990,6 @@ async function saveUserName() {
 
         showToast('Name saved successfully! 👤');
     } catch (error) {
-
         showToast('Error saving name');
     }
 }
@@ -2713,7 +3023,6 @@ async function saveBudget() {
                 .eq('id', currentUserId);
 
             if (error) {
-
                 showToast('Error saving budget. Please try again.');
                 return;
             }
@@ -2724,7 +3033,6 @@ async function saveBudget() {
         updateCurrencyLabels();
         showToast('Budget saved successfully! 💰');
     } catch (error) {
-
         showToast('Error saving budget');
     }
 }
@@ -2740,6 +3048,8 @@ let photoEditorState = {
     contrast: 100,
     saturation: 100,
     cropArea: { x: 0, y: 0, width: 0, height: 0 },
+    offsetX: 0,
+    offsetY: 0,
     isModified: false,
     isDragging: false,
     dragStart: { x: 0, y: 0 },
@@ -2789,7 +3099,8 @@ function initializePhotoEditorWithImage(imageData) {
         document.getElementById('controlsSection').style.display = 'block';
         document.getElementById('actionButtons').style.display = 'flex';
 
-        // Initialize crop area
+        // Reset reposition and crop defaults
+        centerImage();
         initializeCropArea();
     };
     img.src = imageData;
@@ -2803,6 +3114,24 @@ function closePhotoEditOverlay() {
     resetPhotoEditor();
 }
 
+function updatePhotoPreviewPosition() {
+    const img = document.getElementById('photoPreviewImage');
+    if (!img) return;
+    img.style.transform = `translate(${photoEditorState.offsetX}px, ${photoEditorState.offsetY}px)`;
+}
+
+function repositionImage(dx, dy) {
+    photoEditorState.offsetX += dx;
+    photoEditorState.offsetY += dy;
+    updatePhotoPreviewPosition();
+}
+
+function centerImage() {
+    photoEditorState.offsetX = 0;
+    photoEditorState.offsetY = 0;
+    updatePhotoPreviewPosition();
+}
+
 function resetPhotoEditor() {
     photoEditorState = {
         originalImage: null,
@@ -2811,6 +3140,8 @@ function resetPhotoEditor() {
         contrast: 100,
         saturation: 100,
         cropArea: { x: 0, y: 0, width: 0, height: 0 },
+        offsetX: 0,
+        offsetY: 0,
         isModified: false,
         isDragging: false,
         dragStart: { x: 0, y: 0 },
@@ -2853,6 +3184,9 @@ function resetPhotoEditor() {
     // Clear upload area
     const uploadInput = document.getElementById('photoUploadInput');
     if (uploadInput) uploadInput.value = '';
+    if (typeof updatePhotoPreviewPosition === 'function') {
+        updatePhotoPreviewPosition();
+    }
 }
 
 function handlePhotoUpload(event) {
@@ -3122,7 +3456,6 @@ async function savePhotoEdit() {
         }, 1500);
 
     } catch (error) {
-
         document.getElementById('loadingState').classList.remove('active');
         showPhotoError('Failed to save photo. Please try again.');
     } finally {

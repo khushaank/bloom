@@ -27,7 +27,7 @@ function validateStorageData(key, defaultValue = null) {
         if (!data) return defaultValue;
         return JSON.parse(data);
     } catch (error) {
-        console.warn(`Invalid data in localStorage key: ${key}`, error);
+        
         return defaultValue;
     }
 }
@@ -42,7 +42,7 @@ function secureSetlocalStorage(key, value) {
         }
         return true;
     } catch (error) {
-        console.error(`Failed to save to localStorage: ${key}`, error);
+        
         return false;
     }
 }
@@ -84,13 +84,13 @@ if (window.location.hostname !== 'localhost' &&
     window.location.protocol !== 'https:') {
     // In production, enforce HTTPS
     // window.location.href = 'https:' + window.location.href.substring(5);
-    console.warn('Warning: App is running over HTTP. Use HTTPS in production.');
+    
 }
 
 // Monitor for security issues
 window.addEventListener('error', function(event) {
     if (event.message && event.message.includes('xss')) {
-        console.error('Potential XSS attack detected:', event);
+        
     }
 });
 
@@ -101,7 +101,7 @@ function secureStoreSessionData(key, value) {
         sessionStorage.setItem(key, String(value));
         return true;
     } catch (error) {
-        console.error(`Failed to save to sessionStorage: ${key}`, error);
+        
         return false;
     }
 }

@@ -73,8 +73,7 @@ bloom-finance/
 │   │   ├── supabase.js          # Database integration
 │   │   ├── security.js          # Security utilities
 │   │   ├── landing.js           # Landing page logic
-│   │   ├── login.js             # Authentication logic
-│   │   └── image-cropper.js     # Image cropping utility
+│   │   └── login.js             # Authentication logic
 │   └── images/                  # Images and assets
 ├── .htaccess                     # Apache configuration
 ├── .eslintrc                     # Linting rules
