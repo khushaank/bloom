@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Canonical URL -->
@@ -117,7 +118,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 
 <body class="loading-state">
@@ -524,6 +525,10 @@
       </div>
     </section>
 
+    <div class="version-cta" style="padding: 16px 24px; margin: 16px auto; max-width: 960px; border: 1px solid rgba(44,36,22,0.14); border-radius: 16px; background: rgba(122,158,126,0.08); color: #2d5a32; font-size: 14px; line-height: 1.4;">
+      <strong>Bloom v1.0</strong>: this is the first major release. Version 2 will bring AI-powered insights, direct bank connection syncing, smart predictive budgeting, and other futuristic features. Please share feedback or report bugs to <a href="mailto:khushaankgupta@gmail.com" style="color:#2d7660; text-decoration:underline;">khushaankgupta@gmail.com</a>.
+    </div>
+
     <!-- SUBSCRIPTIONS SECTION -->
     <section class="section-page" id="section-subscriptions">
       <div class="greeting-row">
@@ -615,7 +620,8 @@
               </svg>
               Import Data
             </button>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)" aria-label="Import data file">
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"
+              aria-label="Import data file">
             <button class="btn-secondary" onclick="exportCSV()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
@@ -657,9 +663,10 @@
                 </svg>
               </button>
               <div id="avatarMenu" class="avatar-menu" style="display:none;">
-                <button class="avatar-menu-btn" id="avatarUploadBtn">Upload</button>
-                <button class="avatar-menu-btn" id="avatarEditBtn">Edit</button>
-                <button class="avatar-menu-btn" id="avatarDeleteBtn">Delete</button>
+                <button class="avatar-menu-btn"
+                  onclick="document.getElementById('profilePictureInput').click()">Upload</button>
+                <button class="avatar-menu-btn" onclick="openPhotoEditOverlay()">Edit</button>
+                <button class="avatar-menu-btn" onclick="openDeletePhotoModal()">Delete</button>
               </div>
               <input type="file" id="profilePictureInput" accept="image/*" style="display:none"
                 onchange="handleProfilePictureUpload(event)" aria-label="Upload profile picture">
@@ -764,39 +771,45 @@
         <h2 class="card-title" style="margin:0">Add Transaction</h2>
         <button class="modal-close" onclick="closeModal(true)">&times;</button>
       </div>
-      <div class="type-toggle">
-        <button class="type-btn active-income" id="btnIncome" onclick="setType('income')">Income</button>
-        <button class="type-btn" id="btnExpense" onclick="setType('expense')">Expense</button>
+
+      <div class="modal-body">
+        <div class="type-toggle">
+          <button class="type-btn active-income" id="btnIncome" onclick="setType('income')">Income</button>
+          <button class="type-btn" id="btnExpense" onclick="setType('expense')">Expense</button>
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txName">Description</label>
+          <input type="text" class="modal-input" id="txName" placeholder="e.g. Coffee, Salary…" maxlength="40">
+          <div id="txNameSuggestions" class="suggestions-dropdown" style="display: none;"></div>
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txAmount" id="amountLabel">Amount (₹)</label>
+          <input type="number" class="modal-input" id="txAmount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txCategory">Category</label>
+          <select class="modal-input" id="txCategory">
+            <option value="Food & Drink">Food & Drink</option>
+            <option value="Transport">Transport</option>
+            <option value="Housing">Housing</option>
+            <option value="Health">Health</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Education">Education</option>
+            <option value="Salary">Salary</option>
+            <option value="Freelance">Freelance</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txDate">Date</label>
+          <input type="date" class="modal-input" id="txDate">
+        </div>
       </div>
-      <div class="form-group modal-form-group">
-        <label class="modal-label" for="txName">Description</label>
-        <input type="text" class="modal-input" id="txName" placeholder="e.g. Coffee, Salary…" maxlength="40">
-        <div id="txNameSuggestions" class="suggestions-dropdown" style="display: none;"></div>
+
+      <div class="modal-footer">
+        <button class="btn-primary full-width" onclick="addTransaction()" id="addTxBtn">Add Transaction</button>
       </div>
-      <div class="form-group modal-form-group">
-        <label class="modal-label" for="txAmount" id="amountLabel">Amount (₹)</label>
-        <input type="number" class="modal-input" id="txAmount" placeholder="0.00" min="0" step="0.01">
-      </div>
-      <div class="form-group modal-form-group">
-        <label class="modal-label" for="txCategory">Category</label>
-        <select class="modal-input" id="txCategory">
-          <option value="Food & Drink">Food & Drink</option>
-          <option value="Transport">Transport</option>
-          <option value="Housing">Housing</option>
-          <option value="Health">Health</option>
-          <option value="Entertainment">Entertainment</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Education">Education</option>
-          <option value="Salary">Salary</option>
-          <option value="Freelance">Freelance</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      <div class="form-group modal-form-group">
-        <label class="modal-label" for="txDate">Date</label>
-        <input type="date" class="modal-input" id="txDate">
-      </div>
-      <button class="btn-primary full-width" onclick="addTransaction()" id="addTxBtn">Add Transaction</button>
     </div>
 
     <!-- Report Modal -->
@@ -905,6 +918,21 @@
     <button class="toast-close" id="toastClose">✕</button>
   </div>
 
+  <!-- DELETE PHOTO MODAL -->
+  <div id="deletePhotoOverlay" class="delete-photo-overlay">
+    <div class="delete-photo-container">
+      <div class="delete-photo-icon">⚠</div>
+      <h3>Delete Profile Photo?</h3>
+      <p>This will remove your current profile picture and replace it with your initials. This action cannot be undone.
+      </p>
+      <div class="delete-photo-actions">
+        <button class="photo-edit-btn photo-edit-btn-cancel" onclick="closeDeletePhotoModal()">Cancel</button>
+        <button class="photo-edit-btn" style="background:#d4735a; color:white; border:none;"
+          onclick="confirmDeletePhoto()">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PHOTO EDIT OVERLAY -->
   <div id="photoEditOverlay" class="photo-edit-overlay">
     <div class="photo-edit-container">
@@ -920,58 +948,46 @@
 
         <!-- Preview Section -->
         <div class="photo-preview-section" id="previewSection" style="display: none;">
-          <h3 class="photo-preview-label">Preview</h3>
+          <p class="photo-preview-label">Fine-tune your profile photo</p>
           <div class="photo-preview-container">
-            <div class="photo-preview-wrapper">
+            <div class="photo-preview-wrapper" id="photoPreviewWrapper">
               <img id="photoPreviewImage" class="photo-preview-image" alt="Preview">
-              <div class="crop-overlay" id="cropOverlay" style="display: none;">
-                <div class="crop-area" id="cropArea">
-                  <div class="crop-handle nw"></div>
-                  <div class="crop-handle ne"></div>
-                  <div class="crop-handle sw"></div>
-                  <div class="crop-handle se"></div>
-                </div>
-              </div>
+              <div class="photo-frame-curtain"></div>
             </div>
           </div>
         </div>
 
         <!-- Controls Section -->
         <div class="photo-controls-section" id="controlsSection" style="display: none;">
-          <!-- Tool Tabs -->
-          <div class="photo-edit-tabs">
-            <button class="photo-edit-tab active" onclick="switchPhotoEditTab('crop')">Crop</button>
-            <button class="photo-edit-tab" onclick="switchPhotoEditTab('reposition')">Reposition</button>
+          <div class="form-group" style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <label class="crop-tool-label" for="zoomSlider">ZOOM</label>
+              <button class="btn-text-only" onclick="centerImage()"
+                style="font-size:11px; cursor:pointer; color:var(--sage-dark);">RE-CENTER</button>
+            </div>
+            <input type="range" id="zoomSlider" min="0.5" max="3" step="0.01" value="1" style="width:100%"
+              oninput="updateZoom(this.value)">
           </div>
 
-          <!-- Crop Tab -->
-          <div class="photo-edit-tab-content active" id="cropTab">
-            <div class="crop-controls">
-              <div class="crop-presets">
-                <button class="crop-preset-btn" onclick="setCropPreset('square')">1:1</button>
-                <button class="crop-preset-btn" onclick="setCropPreset('portrait')">3:4</button>
-                <button class="crop-preset-btn" onclick="setCropPreset('landscape')">4:3</button>
-                <button class="crop-preset-btn" onclick="setCropPreset('wide')">16:9</button>
+          <div class="photo-edit-grid">
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <label class="crop-tool-label" for="brightnessSlider">Brightness</label>
+                <span id="brightnessValue" style="font-size:11px;">100%</span>
               </div>
-              <div class="crop-instructions">
-                <p>Drag to move crop area, or use presets above</p>
+              <input type="range" id="brightnessSlider" min="0" max="200" value="100" style="width:100%"
+                oninput="updateBrightness(this.value)">
+            </div>
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <label class="crop-tool-label" for="contrastSlider">Contrast</label>
+                <span id="contrastValue" style="font-size:11px;">100%</span>
               </div>
+              <input type="range" id="contrastSlider" min="0" max="200" value="100" style="width:100%"
+                oninput="updateContrast(this.value)">
             </div>
           </div>
-
-          <!-- Reposition Tab -->
-          <div class="photo-edit-tab-content" id="repositionTab">
-            <div class="reposition-controls" style="padding-top:12px;">
-              <p style="margin-bottom:8px; color:var(--ink-light);">Reposition image within the frame:</p>
-              <div class="reposition-grid" style="display:flex; gap:8px; flex-wrap: wrap;">
-                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(0, -10)">Up</button>
-                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(-10, 0)">Left</button>
-                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(10, 0)">Right</button>
-                <button class="btn-secondary" style="flex:1 1 20%;" onclick="repositionImage(0, 10)">Down</button>
-              </div>
-              <button class="btn-primary" style="margin-top:8px; width:100%;" onclick="centerImage()">Center Image</button>
-            </div>
-          </div>
+        </div>
 
         <!-- Status Messages -->
         <div class="photo-edit-loading" id="loadingState">
@@ -988,22 +1004,25 @@
           <span class="error-icon">⚠</span>
           <span id="errorMessage">An error occurred. Please try again.</span>
         </div>
+      </div>
 
-        <!-- Action Buttons -->
-        <div class="photo-edit-buttons" id="actionButtons" style="display: none;">
-          <button class="photo-edit-btn photo-edit-btn-cancel" onclick="resetPhotoEditor()">Cancel</button>
-          <button class="photo-edit-btn photo-edit-btn-save" id="savePhotoBtn" onclick="savePhotoEdit()">Save
-            Photo</button>
-        </div>
+      <!-- Action Buttons (Moved outside content) -->
+      <div class="photo-edit-buttons" id="actionButtons" style="display: none;">
+        <button class="photo-edit-btn photo-edit-btn-cancel" onclick="resetPhotoEditor()">Cancel</button>
+        <button class="photo-edit-btn photo-edit-btn-save" id="savePhotoBtn" onclick="savePhotoEdit()">Save
+          Photo</button>
       </div>
     </div>
+  </div>
 
-    <!-- Subscription Modal -->
-    <div id="subscriptionModal" class="modal">
-      <div class="modal-header">
-        <h2 class="card-title" style="margin:0;">Add Recurring Transaction</h2>
-        <button class="modal-close" onclick="closeModal(true)">&times;</button>
-      </div>
+  <!-- Subscription Modal -->
+  <div id="subscriptionModal" class="modal">
+    <div class="modal-header">
+      <h2 class="card-title" style="margin:0;">Add Recurring Transaction</h2>
+      <button class="modal-close" onclick="closeModal(true)">&times;</button>
+    </div>
+
+    <div class="modal-body">
       <div class="type-toggle">
         <button class="type-btn active-income" id="subBtnIncome" onclick="setSubscriptionType('income')">Income</button>
         <button class="type-btn" id="subBtnExpense" onclick="setSubscriptionType('expense')">Expense</button>
@@ -1044,16 +1063,20 @@
         <label class="modal-label" for="subStartDate">Start Date</label>
         <input type="date" class="modal-input" id="subStartDate">
       </div>
+    </div>
+
+    <div class="modal-footer">
       <button class="btn-primary full-width" onclick="addSubscription()" id="addSubBtn">
         <span class="btn-text">Add Subscription</span>
         <span class="btn-loading" style="display:none;">
           <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none"
-              stroke-dasharray="60 40" stroke-linecap="round" />
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="60 40"
+              stroke-linecap="round" />
           </svg>
         </span>
       </button>
     </div>
+  </div>
 
   </div>
 

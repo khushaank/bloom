@@ -16,11 +16,32 @@ let calendarDate = new Date();
 let chartPeriod = 12;
 let searchQuery = '';
 let profileDropdownOpen = false;
+let avatarMenuOpen = false;
 let currencySymbol = '₹';
 let currencyCode = 'INR';
 let numberFormat = 'en-IN';
 let userAvatar = null;
 let subscriptions = []; // New state for recurring transactions
+
+let appReady = false;
+let pageLoaded = false;
+
+function hideGlobalLoader() {
+    const loader = document.getElementById('globalLoader');
+    if (!loader) return;
+    document.body.classList.remove('loading-state');
+    loader.classList.add('hidden');
+    setTimeout(() => {
+        if (loader.parentElement) loader.remove();
+    }, 500);
+}
+
+window.addEventListener('load', () => {
+    pageLoaded = true;
+    if (appReady) {
+        hideGlobalLoader();
+    }
+});
 
 const CATEGORY_COLORS = {
     'Food & Drink': '#e8a87c', 'Transport': '#7ab8c4', 'Housing': '#a09cc8',
@@ -934,10 +955,15 @@ function switchSection(section, el) {
     }
 
     // Keep URL hash in sync with the current section
-    if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, '', '#' + section);
-    } else {
-        window.location.hash = section;
+    try {
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', '#' + section);
+        } else {
+            window.location.hash = section;
+        }
+    } catch (e) {
+        // Silently fail if file:// security prevents hash changes in some environments
+        // This is a common issue with 'file://' origins and history API
     }
 }
 
@@ -1303,12 +1329,21 @@ function renderNav() {
     yearSel.value = viewDate.getFullYear();
 }
 
-document.getElementById('prevMonth').onclick = () => { viewDate.setMonth(viewDate.getMonth() - 1); update(); };
-document.getElementById('nextMonth').onclick = () => { viewDate.setMonth(viewDate.getMonth() + 1); update(); };
+document.getElementById('prevMonth').onclick = () => {
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    update();
+    renderFullTxList();
+};
+
+document.getElementById('nextMonth').onclick = () => {
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    update();
+    renderFullTxList();
+};
 
 function prevM() { viewDate.setMonth(viewDate.getMonth() - 1); update(); renderFullTxList(); }
 function nextM() { viewDate.setMonth(viewDate.getMonth() + 1); update(); renderFullTxList(); }
-function jumpToCurrent() { viewDate = new Date(); update(); }
+function jumpToCurrent() { viewDate = new Date(); update(); renderFullTxList(); }
 
 // ============================================
 // RENDER TRANSACTIONS
@@ -2040,7 +2075,6 @@ function openModal(modalId) {
 }
 
 function closeModal(force) {
-
     const overlay = document.getElementById('modalOverlay');
 
     // Hide suggestions when closing modal
@@ -2055,23 +2089,18 @@ function closeModal(force) {
 
     // Handle different ways to close:
     // 1. force === true: Close from close button (always close)
-    // 2. force is Event: Close only if clicking on overlay itself, not modal content
-    if (force === true) {
-        // Force close from close button
+    // 2. force is Event: Close only if clicking on overlay itself, not modal
+    const shouldClose = (force === true) || (force instanceof Event && force.target === overlay);
 
-        if (overlay) {
-            overlay.classList.remove('active');
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-        }
-    } else if (force instanceof Event) {
-        // Only close if clicked directly on overlay (not on modal or its children)
-        if (force.target === overlay) {
-
-            if (overlay) {
-                overlay.classList.remove('active');
-                document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-            }
-        }
+    if (shouldClose && overlay) {
+        overlay.classList.remove('active');
+        document.querySelectorAll('.modal').forEach(m => {
+            m.classList.remove('active');
+            // RESET INLINE STYLES added by openModal
+            m.style.opacity = '';
+            m.style.pointerEvents = '';
+            m.style.transform = '';
+        });
     }
 }
 
@@ -2214,24 +2243,26 @@ window.addEventListener('resize', () => {
         renderSpendingHeatmap();
         renderSubscriptions();
 
-        // Hide loader smoothly
+        // Mark app ready, then hide loader when page has fully loaded
+        appReady = true;
+        if (pageLoaded) {
+            hideGlobalLoader();
+        }
+
+        // Fallback, if page load has already happened or takes long
         setTimeout(() => {
-            const loader = document.getElementById('globalLoader');
-            if (loader) {
-                document.body.classList.remove('loading-state');
-                loader.classList.add('hidden');
-                setTimeout(() => loader.remove(), 500);
-            }
-        }, 300);
+            if (pageLoaded) hideGlobalLoader();
+        }, 400);
     } catch (error) {
 
         showToast('Error loading app. Please refresh the page.');
-        // Hide loader on error
-        const loader = document.getElementById('globalLoader');
-        if (loader) {
-            document.body.classList.remove('loading-state');
-            loader.classList.add('hidden');
-            setTimeout(() => loader.remove(), 500);
+        // Hide loader on error (safe fallback)
+        appReady = true;
+        if (pageLoaded) {
+            hideGlobalLoader();
+        } else {
+            // degrade gracefully after timeout
+            setTimeout(hideGlobalLoader, 2000);
         }
     }
 })();
@@ -2334,16 +2365,28 @@ function initProfilePictureUI() {
 // TRANSACTION AUTOCOMPLETE
 // ============================================
 function initializeTransactionModal() {
-    // Set today's date in the date input
+    // Set date to current dashboard month/year
+    // - If current month/year in dashboard: use today
+    // - Otherwise: use first day of selected month
     const dateInput = document.getElementById('txDate');
     if (dateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.value = today;
+        const today = new Date();
+        const targetDate = new Date(viewDate || today);
+
+        if (targetDate.getMonth() === today.getMonth() && targetDate.getFullYear() === today.getFullYear()) {
+            targetDate.setDate(today.getDate());
+        } else {
+            targetDate.setDate(1);
+        }
+
+        dateInput.value = targetDate.toISOString().split('T')[0];
     }
 
     // Clear other fields
-    document.getElementById('txName').value = '';
-    document.getElementById('txAmount').value = '';
+    const txName = document.getElementById('txName');
+    const txAmount = document.getElementById('txAmount');
+    if (txName) txName.value = '';
+    if (txAmount) txAmount.value = '';
 
     // Hide suggestions
     const suggestionsDiv = document.getElementById('txNameSuggestions');
@@ -2732,18 +2775,18 @@ async function saveBudget() {
 // ============================================
 // PHOTO EDITOR FUNCTIONALITY
 // ============================================
-
 let photoEditorState = {
     originalImage: null,
     currentImage: null,
     brightness: 100,
     contrast: 100,
-    saturation: 100,
-    cropArea: { x: 0, y: 0, width: 0, height: 0 },
+    scale: 1,
+    baseScale: 1,
+    translateX: 0,
+    translateY: 0,
     isModified: false,
     isDragging: false,
-    dragStart: { x: 0, y: 0 },
-    activeHandle: null
+    dragStart: { x: 0, y: 0 }
 };
 
 function openPhotoEditOverlay(imageData = null) {
@@ -2755,7 +2798,7 @@ function openPhotoEditOverlay(imageData = null) {
     }
 
     if (!imageData) {
-        showToast('Upload a profile picture first to edit.');
+        showToast('Upload a photo first to edit.');
         return;
     }
 
@@ -2767,32 +2810,76 @@ function openPhotoEditOverlay(imageData = null) {
 }
 
 function initializePhotoEditorWithImage(imageData) {
-    const img = new Image();
-    img.onload = function () {
-        // Set up photo editor state
-        photoEditorState.originalImage = imageData;
-        photoEditorState.currentImage = imageData;
+    // Reset state for new edit
+    photoEditorState.originalImage = imageData;
+    photoEditorState.currentImage = imageData;
+    photoEditorState.scale = 1;
+    photoEditorState.translateX = 0;
+    photoEditorState.translateY = 0;
+    photoEditorState.brightness = 100;
+    photoEditorState.contrast = 100;
 
-        // Set initial crop area to full image
-        photoEditorState.cropArea = {
-            x: 0,
-            y: 0,
-            width: img.width,
-            height: img.height
-        };
+    // Update UI
+    const previewImg = document.getElementById('photoPreviewImage');
+    if (previewImg) {
+        previewImg.src = imageData;
+    }
 
-        // Update UI
-        document.getElementById('photoPreviewImage').src = imageData;
+    // Reset UI controls
+    if (document.getElementById('zoomSlider')) document.getElementById('zoomSlider').value = 1;
+    if (document.getElementById('brightnessSlider')) document.getElementById('brightnessSlider').value = 100;
+    if (document.getElementById('contrastSlider')) document.getElementById('contrastSlider').value = 100;
 
-        // Show preview and controls
-        document.getElementById('previewSection').style.display = 'block';
-        document.getElementById('controlsSection').style.display = 'block';
-        document.getElementById('actionButtons').style.display = 'flex';
+    // Show sections
+    const pSec = document.getElementById('previewSection');
+    const cSec = document.getElementById('controlsSection');
+    const aSec = document.getElementById('actionButtons');
+    if (pSec) pSec.style.display = 'block';
+    if (cSec) cSec.style.display = 'block';
+    if (aSec) aSec.style.display = 'flex';
 
-        // Initialize crop area
-        initializeCropArea();
-    };
-    img.src = imageData;
+    updatePhotoPreviewDisplay();
+}
+
+// Delete Photo Modal Controllers
+function openDeletePhotoModal() {
+    const modal = document.getElementById('deletePhotoOverlay');
+    if (modal) modal.classList.add('active');
+}
+
+function closeDeletePhotoModal() {
+    const modal = document.getElementById('deletePhotoOverlay');
+    if (modal) modal.classList.remove('active');
+}
+
+async function confirmDeletePhoto() {
+    try {
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({
+                profile_picture: null,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', currentUserId);
+
+        if (error) throw error;
+
+        userAvatar = null;
+        updateUserAvatar();
+
+        // Hide settings picture and show initials
+        const settingsProfilePicture = document.getElementById('settingsProfilePicture');
+        if (settingsProfilePicture) {
+            settingsProfilePicture.style.backgroundImage = 'none';
+            // Initials are already updated by updateUserAvatar usually
+        }
+
+        closeDeletePhotoModal();
+        showToast('Profile photo removed.');
+    } catch (err) {
+        console.error('Delete error:', err);
+        showToast('Could not remove photo.');
+    }
 }
 
 function closePhotoEditOverlay() {
@@ -2809,15 +2896,16 @@ function resetPhotoEditor() {
         currentImage: null,
         brightness: 100,
         contrast: 100,
-        saturation: 100,
-        cropArea: { x: 0, y: 0, width: 0, height: 0 },
+        scale: 1,
+        baseScale: 1,
+        translateX: 0,
+        translateY: 0,
         isModified: false,
         isDragging: false,
-        dragStart: { x: 0, y: 0 },
-        activeHandle: null
+        dragStart: { x: 0, y: 0 }
     };
 
-    // Hide all sections
+    // Hide sections
     const previewSection = document.getElementById('previewSection');
     const controlsSection = document.getElementById('controlsSection');
     const actionButtons = document.getElementById('actionButtons');
@@ -2825,382 +2913,246 @@ function resetPhotoEditor() {
     if (controlsSection) controlsSection.style.display = 'none';
     if (actionButtons) actionButtons.style.display = 'none';
 
-    // Reset sliders safely
-    const brightnessSlider = document.getElementById('brightnessSlider');
-    const contrastSlider = document.getElementById('contrastSlider');
-    const saturationSlider = document.getElementById('saturationSlider');
-    if (brightnessSlider) brightnessSlider.value = 100;
-    if (contrastSlider) contrastSlider.value = 100;
-    if (saturationSlider) saturationSlider.value = 100;
+    // Reset UI
+    const bSlider = document.getElementById('brightnessSlider');
+    const cSlider = document.getElementById('contrastSlider');
+    const zSlider = document.getElementById('zoomSlider');
+    if (bSlider) bSlider.value = 100;
+    if (cSlider) cSlider.value = 100;
+    if (zSlider) zSlider.value = 1;
 
-    // Reset tab to crop
-    if (typeof switchPhotoEditTab === 'function') {
-        switchPhotoEditTab('crop');
-    }
+    const bLabel = document.getElementById('brightnessValue');
+    const cLabel = document.getElementById('contrastValue');
+    if (bLabel) bLabel.textContent = '100%';
+    if (cLabel) cLabel.textContent = '100%';
 
-    // Hide crop overlay
-    const cropOverlay = document.getElementById('cropOverlay');
-    if (cropOverlay) cropOverlay.style.display = 'none';
-
-    // Hide status messages
+    // Hide states
     const loadingState = document.getElementById('loadingState');
     const successState = document.getElementById('successState');
     const errorState = document.getElementById('errorState');
     if (loadingState) loadingState.classList.remove('active');
     if (successState) successState.classList.remove('active');
     if (errorState) errorState.classList.remove('active');
-
-    // Clear upload area
-    const uploadInput = document.getElementById('photoUploadInput');
-    if (uploadInput) uploadInput.value = '';
 }
 
-function handlePhotoUpload(event) {
-    const file = event.target.files[0];
+function switchPhotoEditTab(tabName) {
+    document.querySelectorAll('.photo-edit-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.photo-edit-tab-content').forEach(content => content.classList.remove('active'));
 
-    if (!file) {
-        return;
-    }
+    const tabBtn = document.querySelector(`[onclick="switchPhotoEditTab('${tabName}')"]`);
+    if (tabBtn) tabBtn.classList.add('active');
 
-    // Validate file
-    if (!file.type.startsWith('image/')) {
-        showPhotoError('Please select a valid image file');
-        return;
-    }
+    const content = document.getElementById(tabName + 'Tab');
+    if (content) content.classList.add('active');
+}
 
-    if (file.size > 5 * 1024 * 1024) {
-        showPhotoError('Image size must be less than 5MB');
-        return;
-    }
+function updateZoom(value) {
+    photoEditorState.scale = parseFloat(value);
+    updatePhotoPreviewDisplay();
+    photoEditorState.isModified = true;
+}
 
-    // Show loading state
-    document.getElementById('loadingState').classList.add('active');
+function repositionImage(dx, dy) {
+    photoEditorState.translateX += dx;
+    photoEditorState.translateY += dy;
+    updatePhotoPreviewDisplay();
+    photoEditorState.isModified = true;
+}
 
-    // Read file
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const img = new Image();
-        img.onload = function () {
-            // Initialize crop area to full image
-            const containerRect = document.getElementById('photoPreviewImage').parentElement.getBoundingClientRect();
-            const scaleX = containerRect.width / img.width;
-            const scaleY = containerRect.height / img.height;
-            const scale = Math.min(scaleX, scaleY);
+function centerImage() {
+    photoEditorState.translateX = 0;
+    photoEditorState.translateY = 0;
+    photoEditorState.scale = 1;
+    const zSlider = document.getElementById('zoomSlider');
+    if (zSlider) zSlider.value = 1;
+    updatePhotoPreviewDisplay();
+}
 
-            const displayWidth = img.width * scale;
-            const displayHeight = img.height * scale;
+function updatePhotoPreviewDisplay() {
+    const previewImg = document.getElementById('photoPreviewImage');
+    if (!previewImg) return;
 
-            photoEditorState.cropArea = {
-                x: (containerRect.width - displayWidth) / 2,
-                y: (containerRect.height - displayHeight) / 2,
-                width: displayWidth,
-                height: displayHeight
-            };
-
-            photoEditorState.originalImage = e.target.result;
-            photoEditorState.currentImage = e.target.result;
-
-            // Show preview and controls
-            document.getElementById('previewSection').style.display = 'flex';
-            document.getElementById('controlsSection').style.display = 'flex';
-            document.getElementById('actionButtons').style.display = 'flex';
-
-            // Update preview
-            document.getElementById('photoPreviewImage').src = photoEditorState.currentImage;
-
-            // Hide loading state
-            document.getElementById('loadingState').classList.remove('active');
-            hidePhotoError();
-        };
-        img.onerror = function () {
-            document.getElementById('loadingState').classList.remove('active');
-            showPhotoError('Failed to load image');
-        };
-        img.src = e.target.result;
-    };
-
-    reader.onerror = function () {
-        document.getElementById('loadingState').classList.remove('active');
-        showPhotoError('Failed to read file');
-    };
-
-    reader.readAsDataURL(file);
+    // Preserve the -50%, -50% centering and apply user transforms
+    previewImg.style.transform = `translate(-50%, -50%) scale(${photoEditorState.scale}) translate(${photoEditorState.translateX}px, ${photoEditorState.translateY}px)`;
+    previewImg.style.filter = `brightness(${photoEditorState.brightness}%) contrast(${photoEditorState.contrast}%)`;
 }
 
 function updateBrightness(value) {
     photoEditorState.brightness = value;
-    document.getElementById('brightnessValue').textContent = value + '%';
-    photoEditorState.isModified = true;
-    applyFilters();
+    const label = document.getElementById('brightnessValue');
+    if (label) label.textContent = value + '%';
+    updatePhotoPreviewDisplay();
 }
 
 function updateContrast(value) {
     photoEditorState.contrast = value;
-    document.getElementById('contrastValue').textContent = value + '%';
-    photoEditorState.isModified = true;
-    applyFilters();
-}
-
-function updateSaturation(value) {
-    photoEditorState.saturation = value;
-    document.getElementById('saturationValue').textContent = value + '%';
-    photoEditorState.isModified = true;
-    applyFilters();
-}
-
-// ============================================
-// ENHANCED PHOTO EDITOR FUNCTIONS
-// ============================================
-
-function switchPhotoEditTab(tabName) {
-    // Hide all tabs
-    document.querySelectorAll('.photo-edit-tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.photo-edit-tab-content').forEach(content => content.classList.remove('active'));
-
-    // Show selected tab
-    document.querySelector(`[onclick="switchPhotoEditTab('${tabName}')"]`).classList.add('active');
-    document.getElementById(tabName + 'Tab').classList.add('active');
-
-    // Show/hide crop overlay
-    const cropOverlay = document.getElementById('cropOverlay');
-    if (tabName === 'crop') {
-        cropOverlay.style.display = 'block';
-        initializeCropArea();
-    } else {
-        cropOverlay.style.display = 'none';
-    }
-}
-
-function initializeCropArea() {
-    const container = document.querySelector('.photo-preview-wrapper');
-    const containerRect = container.getBoundingClientRect();
-    const img = document.getElementById('photoPreviewImage');
-
-    // Set initial crop area to center square
-    const size = Math.min(containerRect.width, containerRect.height) * 0.8;
-    photoEditorState.cropArea = {
-        x: (containerRect.width - size) / 2,
-        y: (containerRect.height - size) / 2,
-        width: size,
-        height: size
-    };
-
-    updateCropAreaDisplay();
-}
-
-function updateCropAreaDisplay() {
-    const cropArea = document.getElementById('cropArea');
-    const cropOverlay = document.getElementById('cropOverlay');
-
-    cropArea.style.left = photoEditorState.cropArea.x + 'px';
-    cropArea.style.top = photoEditorState.cropArea.y + 'px';
-    cropArea.style.width = photoEditorState.cropArea.width + 'px';
-    cropArea.style.height = photoEditorState.cropArea.height + 'px';
-}
-
-function setCropPreset(preset) {
-    const container = document.querySelector('.photo-preview-wrapper');
-    const containerRect = container.getBoundingClientRect();
-
-    let aspectRatio;
-    switch (preset) {
-        case 'square': aspectRatio = 1; break;
-        case 'portrait': aspectRatio = 3 / 4; break;
-        case 'landscape': aspectRatio = 4 / 3; break;
-        case 'wide': aspectRatio = 16 / 9; break;
-    }
-
-    const size = Math.min(containerRect.width, containerRect.height) * 0.8;
-    let width, height;
-
-    if (aspectRatio > 1) { // landscape
-        width = size;
-        height = size / aspectRatio;
-    } else { // portrait or square
-        height = size;
-        width = size * aspectRatio;
-    }
-
-    photoEditorState.cropArea = {
-        x: (containerRect.width - width) / 2,
-        y: (containerRect.height - height) / 2,
-        width: width,
-        height: height
-    };
-
-    updateCropAreaDisplay();
-    photoEditorState.isModified = true;
-}
-
-function applyFilters() {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-
-    img.onload = function () {
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        // Apply basic adjustments (brightness/contrast/saturation)
-        ctx.filter = `brightness(${photoEditorState.brightness}%) contrast(${photoEditorState.contrast}%) saturate(${photoEditorState.saturation}%)`;
-        ctx.drawImage(img, 0, 0);
-
-        let outputCanvas = canvas;
-
-        // Apply crop
-        if (document.getElementById('cropOverlay').style.display !== 'none') {
-            const croppedCanvas = document.createElement('canvas');
-            const croppedCtx = croppedCanvas.getContext('2d');
-
-            const container = document.querySelector('.photo-preview-wrapper');
-            const containerRect = container.getBoundingClientRect();
-            const imgRect = document.getElementById('photoPreviewImage').getBoundingClientRect();
-
-            const scaleX = img.width / imgRect.width;
-            const scaleY = img.height / imgRect.height;
-
-            const cropX = (photoEditorState.cropArea.x - (imgRect.left - containerRect.left)) * scaleX;
-            const cropY = (photoEditorState.cropArea.y - (imgRect.top - containerRect.top)) * scaleY;
-            const cropWidth = photoEditorState.cropArea.width * scaleX;
-            const cropHeight = photoEditorState.cropArea.height * scaleY;
-
-            croppedCanvas.width = cropWidth;
-            croppedCanvas.height = cropHeight;
-            croppedCtx.drawImage(canvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-            outputCanvas = croppedCanvas;
-        }
-
-        photoEditorState.currentImage = outputCanvas.toDataURL('image/jpeg', 0.95);
-        document.getElementById('photoPreviewImage').src = photoEditorState.currentImage;
-    };
-
-    img.src = photoEditorState.originalImage;
+    const label = document.getElementById('contrastValue');
+    if (label) label.textContent = value + '%';
+    updatePhotoPreviewDisplay();
 }
 
 async function savePhotoEdit() {
     const btn = document.getElementById('savePhotoBtn');
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
 
     document.getElementById('loadingState').classList.add('active');
     hidePhotoError();
 
     try {
-        // Save to user profile
-        if (currentUserId && supabase) {
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    profile_picture: photoEditorState.currentImage,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', currentUserId);
+        // 1. Render visible portion to canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = document.getElementById('photoPreviewImage');
+        const container = document.querySelector('.photo-preview-container');
 
-            if (error) {
-                throw error;
-            }
+        // Final size for avatar
+        canvas.width = 400;
+        canvas.height = 400;
+
+        // We need to draw the original image onto the canvas based on current scale/transform
+        const sourceImg = new Image();
+        sourceImg.crossOrigin = "anonymous";
+        sourceImg.src = photoEditorState.originalImage;
+
+        await new Promise((resolve) => sourceImg.onload = resolve);
+
+        // Apply filters to canvas
+        ctx.filter = `brightness(${photoEditorState.brightness}%) contrast(${photoEditorState.contrast}%)`;
+
+        // Use natural dimensions for output drawing accuracy
+        const nw = sourceImg.naturalWidth || sourceImg.width;
+        const nh = sourceImg.naturalHeight || sourceImg.height;
+
+        // Calculate cover scale (to cover the 400x400 canvas area)
+        const coverScale = Math.max(400 / nw, 400 / nh);
+
+        const finalDrawScale = coverScale * photoEditorState.scale;
+        const drawWidth = nw * finalDrawScale;
+        const drawHeight = nh * finalDrawScale;
+
+        // Offset translataion based on the canvas (400x400) vs editor (200x200) ratio
+        const editorToCanvasRatio = 400 / 200;
+        const centerX = 200 + (photoEditorState.translateX * editorToCanvasRatio);
+        const centerY = 200 + (photoEditorState.translateY * editorToCanvasRatio);
+
+        ctx.drawImage(sourceImg, centerX - (drawWidth / 2), centerY - (drawHeight / 2), drawWidth, drawHeight);
+
+        const finalDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+        // 2. Upload to Supabase Storage
+        const base64Data = finalDataUrl.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
 
-        userAvatar = photoEditorState.currentImage;
+        const fileName = `avatar_${Date.now()}.jpg`;
+        const filePath = `${currentUserId}/${fileName}`;
+
+        // Attempt upload
+        const { data: uploadData, error: uploadError } = await supabaseClient
+            .storage
+            .from('avatars')
+            .upload(filePath, blob, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabaseClient
+            .storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+
+        // 3. Update Database Profile
+        const { error: profileError } = await supabaseClient
+            .from('profiles')
+            .update({
+                profile_picture: publicUrl,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', currentUserId);
+
+        if (profileError) throw profileError;
+
+        // 4. Update UI
+        userAvatar = publicUrl;
         updateUserAvatar();
 
-        // Update settings preview if it exists
         const settingsProfilePicture = document.getElementById('settingsProfilePicture');
         if (settingsProfilePicture) {
-            settingsProfilePicture.style.backgroundImage = `url('${photoEditorState.currentImage}')`;
+            settingsProfilePicture.style.backgroundImage = `url('${publicUrl}')`;
             settingsProfilePicture.textContent = '';
         }
 
-        // Show success message
         document.getElementById('loadingState').classList.remove('active');
         document.getElementById('successState').classList.add('active');
 
-        // Close overlay after delay
         setTimeout(() => {
             closePhotoEditOverlay();
-            showToast('Profile photo updated successfully!');
+            showToast('Profile photo saved! ✨');
         }, 1500);
 
     } catch (error) {
-
         document.getElementById('loadingState').classList.remove('active');
-        showPhotoError('Failed to save photo. Please try again.');
+        showPhotoError('Failed to save photo. ' + (error.message || 'Please try again.'));
     } finally {
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
     }
 }
 
 function showPhotoError(message) {
     const errorState = document.getElementById('errorState');
-    document.getElementById('errorMessage').textContent = message;
-    errorState.classList.add('active');
+    const msgEl = document.getElementById('errorMessage');
+    if (msgEl) msgEl.textContent = message;
+    if (errorState) errorState.classList.add('active');
 }
 
 function hidePhotoError() {
-    document.getElementById('errorState').classList.remove('active');
+    const errorState = document.getElementById('errorState');
+    if (errorState) errorState.classList.remove('active');
 }
 
-// Close overlay when clicking outside
+// Drag & Drop logic for the image
 document.addEventListener('DOMContentLoaded', function () {
-    const photoEditOverlay = document.getElementById('photoEditOverlay');
-    if (photoEditOverlay) {
-        photoEditOverlay.addEventListener('click', function (e) {
-            if (e.target === this) {
-                closePhotoEditOverlay();
+    const wrapper = document.getElementById('photoPreviewWrapper');
+
+    if (wrapper) {
+        wrapper.addEventListener('mousedown', function (e) {
+            if (document.getElementById('repositionTab').classList.contains('active')) {
+                photoEditorState.isDragging = true;
+                photoEditorState.dragStart = { x: e.clientX, y: e.clientY };
+                e.preventDefault();
+                wrapper.style.cursor = 'grabbing';
             }
-        });
-    }
-
-    // 'Drag to upload' removed; only click-to-upload remains.
-
-    // ============================================
-    // CROP AREA DRAG FUNCTIONALITY
-    // ============================================
-
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let initialCropX = 0;
-    let initialCropY = 0;
-
-    const cropArea = document.getElementById('cropArea');
-    if (cropArea) {
-        cropArea.addEventListener('mousedown', function (e) {
-            isDragging = true;
-            dragStartX = e.clientX;
-            dragStartY = e.clientY;
-            initialCropX = photoEditorState.cropArea.x;
-            initialCropY = photoEditorState.cropArea.y;
-            e.preventDefault();
         });
 
         document.addEventListener('mousemove', function (e) {
-            if (!isDragging) return;
+            if (!photoEditorState.isDragging) return;
 
-            const deltaX = e.clientX - dragStartX;
-            const deltaY = e.clientY - dragStartY;
+            const deltaX = e.clientX - photoEditorState.dragStart.x;
+            const deltaY = e.clientY - photoEditorState.dragStart.y;
 
-            const container = document.querySelector('.photo-preview-wrapper');
-            if (!container) return;
+            photoEditorState.translateX += deltaX;
+            photoEditorState.translateY += deltaY;
 
-            const containerRect = container.getBoundingClientRect();
-
-            let newX = initialCropX + deltaX;
-            let newY = initialCropY + deltaY;
-
-            // Constrain to container bounds
-            newX = Math.max(0, Math.min(newX, containerRect.width - photoEditorState.cropArea.width));
-            newY = Math.max(0, Math.min(newY, containerRect.height - photoEditorState.cropArea.height));
-
-            photoEditorState.cropArea.x = newX;
-            photoEditorState.cropArea.y = newY;
-
-            updateCropAreaDisplay();
-            photoEditorState.isModified = true;
+            photoEditorState.dragStart = { x: e.clientX, y: e.clientY };
+            updatePhotoPreviewDisplay();
         });
 
         document.addEventListener('mouseup', function () {
-            isDragging = false;
+            photoEditorState.isDragging = false;
+            if (wrapper) wrapper.style.cursor = 'move';
+        });
+    }
+
+    // Close overlay on background click
+    const overlay = document.getElementById('photoEditOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closePhotoEditOverlay();
         });
     }
 });
