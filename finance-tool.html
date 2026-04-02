@@ -124,14 +124,9 @@
 <body class="loading-state">
 
   <script>
-    // Redirect privacy mode users to dedicated privacy page
-    if (localStorage.getItem('bloom_privacy_mode') === 'true') {
-      window.location.href = 'privacy-mode-finance.html';
-    }
-
     // Apply theme immediately to prevent flash
     (function () {
-      const theme = localStorage.getItem('bloom_theme') || 'dark';
+      const theme = sessionStorage.getItem('bloom_theme') || 'dark';
       const isDark = theme === 'dark';
       if (isDark) {
         document.documentElement.classList.add('dark-mode');
@@ -525,8 +520,12 @@
       </div>
     </section>
 
-    <div class="version-cta" style="padding: 16px 24px; margin: 16px auto; max-width: 960px; border: 1px solid rgba(44,36,22,0.14); border-radius: 16px; background: rgba(122,158,126,0.08); color: #2d5a32; font-size: 14px; line-height: 1.4;">
-      <strong>Bloom v1.0</strong>: this is the first major release. Version 2 will bring AI-powered insights, direct bank connection syncing, smart predictive budgeting, and other futuristic features. Please share feedback or report bugs to <a href="mailto:khushaankgupta@gmail.com" style="color:#2d7660; text-decoration:underline;">khushaankgupta@gmail.com</a>.
+    <div class="version-cta"
+      style="padding: 16px 24px; margin: 16px auto; max-width: 960px; border: 1px solid rgba(44,36,22,0.14); border-radius: 16px; background: rgba(122,158,126,0.08); color: #2d5a32; font-size: 14px; line-height: 1.4;">
+      <strong>Bloom v1.0</strong>: this is the first major release. Version 2 will bring AI-powered insights, direct
+      bank connection syncing, smart predictive budgeting, and other futuristic features. Please share feedback or
+      report bugs to <a href="mailto:khushaankgupta@gmail.com"
+        style="color:#2d7660; text-decoration:underline;">khushaankgupta@gmail.com</a>.
     </div>
 
     <!-- SUBSCRIPTIONS SECTION -->
@@ -1082,7 +1081,6 @@
 
   <script src="assets/js/security.js"></script>
   <script src="assets/js/supabase.js"></script>
-  <script src="assets/js/onboarding.js" defer></script>
   <script src="assets/js/script.js" defer></script>
 </body>
 

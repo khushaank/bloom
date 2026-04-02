@@ -654,12 +654,6 @@ async function deleteSubscription(id) {
 }
 
 async function saveProfile() {
-    const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-    if (privacyMode) {
-        await saveOfflineData();
-        return;
-    }
-
     // Map currency symbol to code for database
     const currencyMap = {
         '₹': 'INR',
@@ -714,11 +708,6 @@ async function insertTransaction(tx) {
 }
 
 async function removeTransaction(id) {
-    const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-    if (privacyMode) {
-        await saveOfflineData();
-        return;
-    }
     const { error } = await supabaseClient
         .from('transactions')
         .delete()
@@ -728,17 +717,6 @@ async function removeTransaction(id) {
 }
 
 async function insertGoal(goal) {
-    const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-    if (privacyMode) {
-        const data = {
-            id: 'privacy_' + Date.now(),
-            name: goal.name,
-            target_amount: goal.target,
-            current_amount: 0,
-            deadline: goal.deadline || null
-        };
-        return data;
-    }
     const { data, error } = await supabaseClient
         .from('goals')
         .insert({
@@ -755,11 +733,6 @@ async function insertGoal(goal) {
 }
 
 async function updateGoalAmount(id, amount) {
-    const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-    if (privacyMode) {
-        await saveOfflineData();
-        return;
-    }
     const { error } = await supabaseClient
         .from('goals')
         .update({ current_amount: amount })
@@ -769,11 +742,6 @@ async function updateGoalAmount(id, amount) {
 }
 
 async function removeGoal(id) {
-    const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-    if (privacyMode) {
-        await saveOfflineData();
-        return;
-    }
     const { error } = await supabaseClient
         .from('goals')
         .delete()
@@ -889,19 +857,7 @@ function setupSettingsSaveButtons() {
 }
 
 
-async function saveOfflineData() {
-    const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-    if (privacyMode) {
-        const data = {
-            transactions,
-            goals,
-            monthlyBudget,
-            currencySymbol,
-            lastSaved: new Date().toISOString()
-        };
-        localStorage.setItem('bloom_privacy_data', JSON.stringify(data));
-    }
-}
+
 
 // ============================================
 // SECTIONS / NAVIGATION
@@ -929,7 +885,7 @@ function switchSection(section, el) {
         document.getElementById('currencySelect').value = selectedCurrency;
         const themeSelect = document.getElementById('themeSelect');
         if (themeSelect) {
-            themeSelect.value = localStorage.getItem('bloom_theme') || 'dark';
+            themeSelect.value = sessionStorage.getItem('bloom_theme') || 'dark';
         }
 
         // Update Save button visibility
@@ -943,15 +899,7 @@ function switchSection(section, el) {
         }
 
         // Show mode indicator in settings
-        const settingsEmail = document.getElementById('settingsEmail');
-        const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-        if (settingsEmail) {
-            if (privacyMode) {
-                settingsEmail.parentElement.innerHTML = '<p style="color:var(--sage);font-size:14px;margin-bottom:16px;"><strong>Privacy Mode</strong> - All data local only</p>';
-            } else {
-                settingsEmail.textContent = userEmail;
-            }
-        }
+        settingsEmail.textContent = userEmail;
     }
 
     // Keep URL hash in sync with the current section
@@ -978,7 +926,7 @@ function toggleSidebarCollapse() {
     const sidebar = document.getElementById('sidebar');
     const isCollapsed = sidebar.classList.contains('collapsed');
     sidebar.classList.toggle('collapsed');
-    localStorage.setItem('bloom_sidebar_collapsed', !isCollapsed);
+    sessionStorage.setItem('bloom_sidebar_collapsed', !isCollapsed);
 }
 
 // ============================================
@@ -1002,10 +950,8 @@ document.addEventListener('click', (e) => {
 async function handleLogout() {
     await supabaseClient.auth.signOut();
 
-    // clear privacy mode flags when regular user logs out
-    localStorage.removeItem('bloom_privacy_mode');
-    localStorage.removeItem('bloom_session_id');
-    localStorage.removeItem('bloom_privacy_data');
+    // clear session flags when regular user logs out
+    sessionStorage.removeItem('bloom_session_id');
 
     window.location.href = 'login.html';
 }
@@ -1068,15 +1014,7 @@ async function addTransaction() {
     const btn = document.getElementById('addTxBtn');
     if (btn) btn.disabled = true;
 
-    const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-    let result = null;
-
-    if (privacyMode) {
-        // For privacy mode, create a fake ID and add directly
-        result = { id: 'privacy_' + Date.now(), transaction_date: txDate };
-    } else {
-        result = await insertTransaction({ name, amount, category, type: currentType, date: txDate });
-    }
+    const result = await insertTransaction({ name, amount, category, type: currentType, date: txDate });
 
     if (result) {
         transactions.unshift({
@@ -1415,7 +1353,7 @@ function buildTxItem(t) {
 function renderChart(txs) {
     try {
         const donutTotal = document.getElementById('donutTotal');
-        if (!donutTotal) return; // Exit if chart elements don't exist (privacy mode)
+        if (!donutTotal) return;
 
         const expenses = txs.filter(t => t.type === 'expense');
         const total = expenses.reduce((s, t) => s + t.amount, 0);
@@ -1428,7 +1366,7 @@ function renderChart(txs) {
         const seg = document.getElementById('donutSegments');
         const legend = document.getElementById('chartLegend');
 
-        if (!seg || !legend) return; // Exit if elements don't exist
+        if (!seg || !legend) return;
 
         if (sorted.length === 0) {
             seg.innerHTML = '';
@@ -1673,7 +1611,6 @@ async function addNewGoal() {
         document.getElementById('goalTarget').value = '';
         document.getElementById('goalDeadline').value = '';
         hideAddGoalForm(); renderGoals(); renderGoalsPreview(); renderGoalsFull();
-        await saveOfflineData();
         showToast('Goal created successfully');
     }
 }
@@ -1689,7 +1626,6 @@ async function addGoalContribution(id, prefix = '') {
         await updateGoalAmount(id, goal.current);
         renderGoals(); renderGoalsPreview(); renderGoalsFull();
         input.value = '';
-        await saveOfflineData();
         showToast('Contribution added');
     }
 }
@@ -1699,7 +1635,6 @@ async function deleteGoal(id) {
         await removeGoal(id);
         goals = goals.filter(g => g.id !== id);
         renderGoals(); renderGoalsPreview(); renderGoalsFull();
-        await saveOfflineData();
         showToast('Goal deleted');
     }
 }
@@ -1733,7 +1668,6 @@ async function saveBudgetInline() {
         await saveProfile();
         update();
         updateBudgetSection();
-        await saveOfflineData();
         showToast('Budget updated');
     }
 }
@@ -1756,7 +1690,6 @@ async function saveCurrency() {
     await saveProfile();
     updateCurrencyLabels();
     update();
-    await saveOfflineData();
     document.getElementById('saveCurrencyBtn').style.display = 'none';
     if (document.getElementById('addGoalForm')) document.getElementById('addGoalForm').style.display = 'none';
 }
@@ -1767,15 +1700,15 @@ async function saveTheme() {
     // Apply theme immediately
     applyTheme(theme);
 
-    // Save to localStorage for persistence (Supabase theme column will be added later)
-    localStorage.setItem('bloom_theme', theme);
+    // Save to sessionStorage for persistence (Supabase theme column will be added later)
+    sessionStorage.setItem('bloom_theme', theme);
 
     showToast(`Theme set to ${theme.charAt(0).toUpperCase() + theme.slice(1)}`);
 }
 
 function toggleTheme() {
     const html = document.documentElement;
-    const currentTheme = localStorage.getItem('bloom_theme') || 'system';
+    const currentTheme = sessionStorage.getItem('bloom_theme') || 'system';
     let newTheme;
 
     if (currentTheme === 'system') {
@@ -1786,7 +1719,7 @@ function toggleTheme() {
         newTheme = 'system';
     }
 
-    localStorage.setItem('bloom_theme', newTheme);
+    sessionStorage.setItem('bloom_theme', newTheme);
     applyTheme(newTheme);
     updateThemeButton();
     showToast(`Theme: ${newTheme === 'system' ? 'System' : newTheme.charAt(0).toUpperCase() + newTheme.slice(1)}`);
@@ -1808,7 +1741,7 @@ function applyTheme(theme) {
 }
 
 function updateThemeButton() {
-    const theme = localStorage.getItem('bloom_theme') || 'system';
+    const theme = sessionStorage.getItem('bloom_theme') || 'system';
     const themeSelect = document.getElementById('themeSelect');
     if (themeSelect) themeSelect.value = theme;
 }
@@ -2115,13 +2048,7 @@ function setFinancialTip() {
     }
 }
 
-function exitPrivacyMode() {
-    if (confirm('Exit Privacy Mode? Your local data will be preserved. You can return to Privacy Mode anytime.')) {
-        localStorage.removeItem('bloom_privacy_mode');
-        localStorage.removeItem('bloom_session_id');
-        window.location.href = 'login.html';
-    }
-}
+
 
 // ============================================
 // KEYBOARD
@@ -2157,55 +2084,14 @@ window.addEventListener('resize', () => {
     resizeTimer = setTimeout(() => renderAreaChart(), 200);
 });
 
-// ============================================
-// INIT (Auth-gated or Privacy Mode)
-// ============================================
 (async function init() {
     try {
         // Apply theme immediately on load
-        const theme = localStorage.getItem('bloom_theme') || 'system';
+        const theme = sessionStorage.getItem('bloom_theme') || 'system';
         applyTheme(theme);
         updateThemeButton();
 
-        // Check for Privacy Mode first (completely separate from auth)
-        const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
-        if (privacyMode) {
-            // Load from localStorage (Privacy Mode - no Supabase)
-            const privacyData = JSON.parse(localStorage.getItem('bloom_privacy_data') || '{}');
-            transactions = privacyData.transactions || [];
-            goals = privacyData.goals || [];
-            userName = 'You (Private)';
-            monthlyBudget = privacyData.monthlyBudget || 2000;
-            currencySymbol = privacyData.currencySymbol || '₹';
-            const currencyMap = {
-                '₹': { code: 'INR', locale: 'en-IN' },
-                '$': { code: 'USD', locale: 'en-US' },
-                '€': { code: 'EUR', locale: 'en-DE' },
-                '£': { code: 'GBP', locale: 'en-GB' }
-            };
-            const currData = currencyMap[currencySymbol] || { code: 'INR', locale: 'en-IN' };
-            currencyCode = currData.code;
-            numberFormat = currData.locale;
-            currentUserId = localStorage.getItem('bloom_session_id');
-            userEmail = '';
 
-            updateGreeting();
-            updateCurrencyLabels();
-            update();
-
-            showToast('Running in Privacy Mode - no data synced');
-
-            // Hide loader
-            setTimeout(() => {
-                const loader = document.getElementById('globalLoader');
-                if (loader) {
-                    document.body.classList.remove('loading-state');
-                    loader.classList.add('hidden');
-                    setTimeout(() => loader.remove(), 500);
-                }
-            }, 300);
-            return;
-        }
 
         // Regular Authentication Flow (Supabase)
         const user = await requireAuth();
@@ -2597,7 +2483,7 @@ function initSubscriptionAutocomplete() {
 // Call on DOM ready
 document.addEventListener('DOMContentLoaded', function () {
     // Restore sidebar collapsed state
-    const isSidebarCollapsed = localStorage.getItem('bloom_sidebar_collapsed') === 'true';
+    const isSidebarCollapsed = sessionStorage.getItem('bloom_sidebar_collapsed') === 'true';
     const sidebar = document.getElementById('sidebar');
     if (sidebar && isSidebarCollapsed) {
         sidebar.classList.add('collapsed');
@@ -2693,21 +2579,15 @@ async function saveUserName() {
         // Update global state
         userName = newName;
 
-        // Check if privacy mode
-        const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
+        // Save to Supabase
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ display_name: userName })
+            .eq('id', currentUserId);
 
-        if (!privacyMode) {
-            // Save to Supabase
-            const { error } = await supabaseClient
-                .from('profiles')
-                .update({ display_name: userName })
-                .eq('id', currentUserId);
-
-            if (error) {
-
-                showToast('Error saving name. Please try again.');
-                return;
-            }
+        if (error) {
+            showToast('Error saving name. Please try again.');
+            return;
         }
 
         // Update all avatars and UI
@@ -2745,21 +2625,15 @@ async function saveBudget() {
         // Update global state
         monthlyBudget = newBudget;
 
-        // Check if privacy mode
-        const privacyMode = localStorage.getItem('bloom_privacy_mode') === 'true';
+        // Save to Supabase
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ monthly_budget: monthlyBudget })
+            .eq('id', currentUserId);
 
-        if (!privacyMode) {
-            // Save to Supabase
-            const { error } = await supabaseClient
-                .from('profiles')
-                .update({ monthly_budget: monthlyBudget })
-                .eq('id', currentUserId);
-
-            if (error) {
-
-                showToast('Error saving budget. Please try again.');
-                return;
-            }
+        if (error) {
+            showToast('Error saving budget. Please try again.');
+            return;
         }
 
         // Update UI

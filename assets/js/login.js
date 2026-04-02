@@ -55,51 +55,6 @@ function setLoading(btn, loading) {
     }
 }
 
-function enterOfflineMode(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-    try {
-        // Set offline flag in localStorage
-        localStorage.setItem('bloom_offline_mode', 'true');
-        localStorage.setItem('bloom_user_id', 'offline_' + Date.now());
-        // Initialize empty data if not exists
-        if (!localStorage.getItem('bloom_offline_data')) {
-            localStorage.setItem('bloom_offline_data', JSON.stringify({
-                transactions: [],
-                goals: [],
-                userName: 'Guest (Offline)',
-                monthlyBudget: 2000,
-                currencySymbol: '₹'
-            }));
-        }
-        // Ensure localStorage is synced before redirect
-        setTimeout(() => {
-            window.location.href = 'finance-tool.html';
-        }, 100);
-    } catch (error) {
-        
-        alert('Unable to enter offline mode. Please check your browser storage.');
-    }
-    return false;
-}
-
-async function handleGoogleLogin() {
-    clearErrors();
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: window.location.origin + '/finance-tool.html'
-        }
-    });
-
-    if (error) {
-        document.getElementById('loginError').textContent = error.message;
-        document.getElementById('signupError').textContent = error.message;
-    }
-}
-
 async function handleLogin(e) {
     e.preventDefault();
     clearErrors();
@@ -127,10 +82,7 @@ async function handleLogin(e) {
         return;
     }
 
-    // Ensure regular (non-privacy) mode after a successful login
-    localStorage.removeItem('bloom_privacy_mode');
-    localStorage.removeItem('bloom_session_id');
-    localStorage.removeItem('bloom_privacy_data');
+
 
     window.location.href = 'finance-tool.html';
 }
@@ -182,10 +134,7 @@ async function handleSignup(e) {
         return;
     }
 
-    // Ensure regular (non-privacy) mode for new created accounts
-    localStorage.removeItem('bloom_privacy_mode');
-    localStorage.removeItem('bloom_session_id');
-    localStorage.removeItem('bloom_privacy_data');
+
 
     // Show confirmation message
     document.getElementById('confirmEmail').textContent = email;

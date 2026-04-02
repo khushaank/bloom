@@ -9,7 +9,6 @@ A sophisticated personal finance tracker designed for professionals who value pr
 📊 **Beautiful Analytics** - Intelligent insights in a calm, professional environment
 💰 **Budget Management** - Set monthly budgets and track spending patterns
 🌍 **Multi-currency Support** - Track finances in any currency
-🔐 **Privacy Mode** - 100% local-only tracking with zero cloud sync
 📱 **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
 
 ## Getting Started
@@ -62,7 +61,6 @@ bloom-finance/
 ├── index.html                    # Landing page
 ├── login.html                    # Authentication page
 ├── finance-tool.html             # Main dashboard
-├── privacy-mode-finance.html     # Privacy mode dashboard
 ├── assets/
 │   ├── css/
 │   │   ├── style.css            # Main styles
@@ -108,8 +106,6 @@ Bloom is committed to your privacy:
 - ✅ No data selling
 - ✅ Open privacy policy
 - ✅ GDPR compliant
-- ✅ Privacy Mode for local-only data storage
-
 See [Privacy Policy](privacy.html) for details.
 
 ## Browser Support
@@ -170,14 +166,11 @@ We welcome contributions! Please follow these steps:
 
 ```javascript
 // Theme setting
-localStorage.getItem('bloom_theme')  // 'light' | 'dark' | 'system'
+sessionStorage.getItem('bloom_theme')  // 'light' | 'dark' | 'system'
 
-// Privacy mode flag
-localStorage.getItem('bloom_privacy_mode')  // 'true' | 'false'
-
-// User data (locally in privacy mode)
-localStorage.getItem('bloom_transactions')
-localStorage.getItem('bloom_goals')
+// User data
+sessionStorage.getItem('bloom_transactions')
+sessionStorage.getItem('bloom_goals')
 ```
 
 ## License

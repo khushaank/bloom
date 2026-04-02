@@ -20,10 +20,10 @@ function sanitizeInput(input) {
     return div.innerHTML;
 }
 
-// Validate and sanitize JSON data from localStorage
+// Validate and sanitize JSON data from sessionStorage
 function validateStorageData(key, defaultValue = null) {
     try {
-        const data = localStorage.getItem(key);
+        const data = sessionStorage.getItem(key);
         if (!data) return defaultValue;
         return JSON.parse(data);
     } catch (error) {
@@ -32,13 +32,13 @@ function validateStorageData(key, defaultValue = null) {
     }
 }
 
-// Secure localStorage operations
-function secureSetlocalStorage(key, value) {
+// Secure sessionStorage operations
+function secureSetsessionStorage(key, value) {
     try {
         if (typeof value === 'object') {
-            localStorage.setItem(key, JSON.stringify(value));
+            sessionStorage.setItem(key, JSON.stringify(value));
         } else {
-            localStorage.setItem(key, String(value));
+            sessionStorage.setItem(key, String(value));
         }
         return true;
     } catch (error) {
@@ -69,11 +69,11 @@ function generateSecurityToken() {
 // Clear sensitive data on logout
 function clearSensitiveData() {
     // Clear authentication data
-    const keys = Object.keys(localStorage);
+    const keys = Object.keys(sessionStorage);
     keys.forEach(key => {
         if (key.includes('token') || key.includes('session') || 
             key.includes('auth') || key.includes('password')) {
-            localStorage.removeItem(key);
+            sessionStorage.removeItem(key);
         }
     });
 }
@@ -94,7 +94,7 @@ window.addEventListener('error', function(event) {
     }
 });
 
-// Secure password storage: Never store passwords in localStorage
+// Secure password storage: Never store passwords in sessionStorage
 // Always use sessionStorage for temporary sensitive data
 function secureStoreSessionData(key, value) {
     try {
@@ -131,7 +131,7 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         sanitizeInput,
         validateStorageData,
-        secureSetlocalStorage,
+        secureSetsessionStorage,
         displayText,
         validateOrigin,
         generateSecurityToken,

@@ -41,7 +41,6 @@
   • Real-time expense tracking
   • Encrypted data storage
   • Savings goals & budgeting
-  • Privacy mode (local-only)
   • Beautiful dashboard
   • Multi-currency support
   • Bank-level security
