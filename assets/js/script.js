@@ -1025,17 +1025,16 @@ async function addTransaction() {
         if (dateInput) dateInput.value = '';
         update();
         closeModal(true);
-        await saveOfflineData();
         showToast(currentType === 'income' ? 'Income added successfully' : 'Expense recorded successfully');
     }
     if (btn) btn.disabled = false;
 }
 
 async function deleteTransaction(id) {
+    if (!confirm('Are you sure you want to delete this transaction?')) return;
     await removeTransaction(id);
     transactions = transactions.filter(t => t.id !== id);
     update();
-    await saveOfflineData();
     showToast('Transaction removed');
 }
 

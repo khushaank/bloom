@@ -27,7 +27,7 @@ function validateStorageData(key, defaultValue = null) {
         if (!data) return defaultValue;
         return JSON.parse(data);
     } catch (error) {
-        
+
         return defaultValue;
     }
 }
@@ -42,7 +42,7 @@ function secureSetsessionStorage(key, value) {
         }
         return true;
     } catch (error) {
-        
+
         return false;
     }
 }
@@ -71,7 +71,7 @@ function clearSensitiveData() {
     // Clear authentication data
     const keys = Object.keys(sessionStorage);
     keys.forEach(key => {
-        if (key.includes('token') || key.includes('session') || 
+        if (key.includes('token') || key.includes('session') ||
             key.includes('auth') || key.includes('password')) {
             sessionStorage.removeItem(key);
         }
@@ -79,18 +79,18 @@ function clearSensitiveData() {
 }
 
 // HTTPS enforcement (if not localhost)
-if (window.location.hostname !== 'localhost' && 
+if (window.location.hostname !== 'localhost' &&
     window.location.hostname !== '127.0.0.1' &&
     window.location.protocol !== 'https:') {
     // In production, enforce HTTPS
     // window.location.href = 'https:' + window.location.href.substring(5);
-    
+
 }
 
 // Monitor for security issues
-window.addEventListener('error', function(event) {
+window.addEventListener('error', function (event) {
     if (event.message && event.message.includes('xss')) {
-        
+
     }
 });
 
@@ -101,24 +101,12 @@ function secureStoreSessionData(key, value) {
         sessionStorage.setItem(key, String(value));
         return true;
     } catch (error) {
-        
+
         return false;
     }
 }
-
-// Clear session data on page unload
-window.addEventListener('beforeunload', function() {
-    // Clear any temporary sensitive data
-    sessionStorage.clear();
-});
-
-// Disable right-click on sensitive elements (optional, can be disabled)
-// document.addEventListener('contextmenu', (e) => {
-//     if (e.target.dataset.noContext) e.preventDefault();
-// }, true);
-
 // Disable autocomplete for password fields
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Find all password inputs and disable autocomplete
     const passwordInputs = document.querySelectorAll('input[type="password"]');
     passwordInputs.forEach(input => {
