@@ -36,7 +36,7 @@
     --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark Mode Color Scheme */
+
 html.dark-mode {
     --cream: #1a1a1e;
     --warm-white: #2a2a30;
@@ -56,7 +56,7 @@ html.dark-mode {
     --box-shadow-card: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
-/* Explicit Light Mode */
+
 html.light-mode {
     --cream: #f4f1ec;
     --warm-white: #faf8f5;
@@ -96,7 +96,7 @@ body {
     text-align: left;
 }
 
-/* ensure all page headers default left, avoid right-shifted titles */
+
 h1,
 h2,
 h3,
@@ -261,7 +261,7 @@ h6,
     opacity: 1;
 }
 
-/* Adjust main content margin when sidebar is collapsed */
+
 .sidebar.collapsed~.main-wrapper {
     margin-left: 80px;
 }
@@ -517,7 +517,7 @@ h6,
     max-width: 1300px;
 }
 
-/* ensure left classic interior alignment for page-level content */
+
 .greeting-row {
     display: flex;
     align-items: flex-start;
@@ -637,7 +637,7 @@ h6,
     border: 2px solid var(--card-bg);
 }
 
-/* Profile Dropdown */
+
 .profile-dropdown-wrapper {
     position: relative;
 }
@@ -796,7 +796,7 @@ h6,
     text-shadow: 0 3px 8px rgba(35, 100, 77, 0.15);
 }
 
-/* enforce left alignment on key page title styles */
+
 .page-title,
 .article-title,
 .error-title,
@@ -1100,7 +1100,7 @@ h3 {
     font-size: 11px;
 }
 
-/* BUDGET PROGRESS */
+
 .budget-progress {
     background: var(--cream);
     border-radius: 40px;
@@ -1229,7 +1229,7 @@ h3 {
     letter-spacing: 0.05em;
 }
 
-/* DONUT CHART */
+
 .donut-chart-card {
     display: flex;
     flex-direction: column;
@@ -1503,12 +1503,12 @@ h3 {
     gap: 12px;
 }
 
-/* GOALS CARD is now hidden (removed from dashboard) */
+
 .goals-card {
     display: none !important;
 }
 
-/* FINANCIAL TIP merged into background */
+
 .tip-card {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(60, 97, 72, 0.16);
@@ -1642,7 +1642,7 @@ h3 {
     background: rgba(122, 158, 126, 0.05);
 }
 
-/* FINANCIAL TIP CARD */
+
 .tip-card {
     background: linear-gradient(145deg, var(--sage-darker) 0%, #1a3d1f 100%);
     border-radius: var(--radius-lg);
@@ -1976,12 +1976,12 @@ h3 {
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden !important; /* Contain the scrollable body */
+    overflow: hidden !important;
     opacity: 0;
     pointer-events: none;
     z-index: 10100;
     color: var(--ink);
-    padding: 0; /* Remove padding from outer container to allow header/footer to be full width if needed */
+    padding: 0;
 }
 
 .modal.active {
@@ -2070,7 +2070,7 @@ h3 {
     font-weight: 700;
 }
 
-/* MODAL FORMS */
+
 .modal-form-group {
     margin-bottom: 16px;
     position: relative;
@@ -2162,7 +2162,7 @@ html.dark-mode .suggestion-item.highlighted {
     background: rgba(122, 158, 126, 0.2);
 }
 
-/* TYPE TOGGLE (in modal) */
+
 .type-toggle {
     display: flex;
     gap: 8px;
@@ -2373,7 +2373,7 @@ html.light-mode .toast {
     opacity: 0.7;
 }
 
-/* Profile Picture Section */
+
 .profile-picture-section {
     margin-bottom: 24px;
     padding-bottom: 24px;
@@ -2434,7 +2434,7 @@ html.light-mode .toast {
     border-color: var(--coral);
 }
 
-/* Button Styles */
+
 .btn-logout {
     color: var(--coral) !important;
     border-color: var(--coral) !important;
@@ -2567,7 +2567,7 @@ html.light-mode .toast {
     font-weight: 600;
 }
 
-/* Responsive and UX Improvements */
+
 @media (max-width: 1100px) {
     .main-wrapper {
         width: calc(100% - 80px);
@@ -2642,7 +2642,7 @@ html.light-mode .toast {
     margin-top: 10px;
 }
 
-/* Account Info */
+
 .account-info {
     color: var(--ink-light);
     font-size: 14px;
@@ -2653,7 +2653,7 @@ html.light-mode .toast {
     font-weight: 600;
 }
 
-/* Settings Help Text */
+
 .settings-help-text {
     color: var(--ink-faint);
     font-size: 12px;
@@ -2666,16 +2666,16 @@ html.light-mode .toast {
     margin-bottom: 12px;
 }
 
-/* Theme Button */
+
 .theme-button {
     width: 100%;
     justify-content: center;
     gap: 8px;
 }
 
-/* Empty State */
 
-/* Responsive Settings and Profile Card */
+
+
 @media (max-width: 900px) {
     .settings-grid {
         grid-template-columns: 1fr;
@@ -2744,17 +2744,17 @@ html.light-mode .toast {
     margin: 0;
 }
 
-/* Card Title No Margin */
+
 .card-title-compact {
     margin-bottom: 0;
 }
 
-/* Filter Pills */
+
 .filter-pills-container {
     margin-bottom: 16px;
 }
 
-/* Budget Display */
+
 .budget-display {
     font-size: 14px;
     color: var(--ink-light);
@@ -2762,7 +2762,7 @@ html.light-mode .toast {
     line-height: 1.6;
 }
 
-/* Settings Help Text */
+
 .settings-help-text {
     color: var(--ink-light);
     font-size: 13px;
@@ -2781,7 +2781,7 @@ html.light-mode .toast {
    RESPONSIVE
    ============================================ */
 
-/* TABLET */
+
 @media (max-width: 1100px) {
     .summary-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -2944,7 +2944,7 @@ html.light-mode .toast {
     }
 }
 
-/* Scrollbar styling */
+
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -2962,13 +2962,13 @@ html.light-mode .toast {
     background: var(--ink-light);
 }
 
-/* ENHANCED BUTTON STYLES */
+
 button:focus-visible {
     outline: 2px solid var(--sage);
     outline-offset: 2px;
 }
 
-/* TOAST NOTIFICATIONS */
+
 .toast {
     animation: slideInUp 0.3s ease-out forwards;
     box-shadow: 0 8px 24px rgba(44, 36, 22, 0.15);
@@ -2998,11 +2998,11 @@ button:focus-visible {
     }
 }
 
-/* SMOOTH TRANSITIONS */
+
 .modal.active {
     opacity: 1 !important;
     animation: none;
-    /* Temporarily disable animation */
+
 }
 
 @keyframes fadeInScale {
@@ -3017,7 +3017,7 @@ button:focus-visible {
     }
 }
 
-/* DROPDOWN & MENU ENHANCEMENTS */
+
 .dropdown-menu {
     animation: fadeInDown 0.2s ease-out;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -3035,7 +3035,7 @@ button:focus-visible {
     }
 }
 
-/* IMPROVED FORM STYLING */
+
 textarea,
 input[type="text"],
 input[type="email"],
@@ -3057,7 +3057,7 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(122, 158, 126, 0.1);
 }
 
-/* IMPROVED CARD STYLING */
+
 .card {
     transition: all var(--transition);
 }
@@ -3066,7 +3066,7 @@ select:focus {
     box-shadow: 0 8px 32px rgba(44, 36, 22, 0.12);
 }
 
-/* BADGE & LABEL ENHANCEMENTS */
+
 .badge {
     display: inline-block;
     padding: 4px 12px;
@@ -3087,13 +3087,13 @@ select:focus {
     color: #8b1a1a;
 }
 
-/* IMPROVED LOADING STATE */
+
 .loading {
     opacity: 0.6;
     pointer-events: none;
 }
 
-/* DARK MODE SUPPORT (for future) */
+
 @media (prefers-color-scheme: dark) {
     :root {
         --cream: #1a1a1a;
@@ -3105,7 +3105,7 @@ select:focus {
     }
 }
 
-/* REDUCED MOTION SUPPORT */
+
 @media (prefers-reduced-motion: reduce) {
     * {
         animation: none !important;
@@ -3113,13 +3113,13 @@ select:focus {
     }
 }
 
-/* Selection */
+
 ::selection {
     background: var(--sage-light);
     color: var(--ink);
 }
 
-/* ADDITIONAL MEDIA QUERIES EXTENDED */
+
 @media (max-width: 1024px) {
     .charts-row {
         grid-template-columns: 1fr;
@@ -3214,7 +3214,7 @@ select:focus {
     transform: translateY(0);
 }
 
-/* Responsive behavior for photo editor */
+
 @media (max-width: 900px) {
     .photo-edit-container {
         max-width: 90%;
@@ -3291,7 +3291,7 @@ select:focus {
     gap: 24px;
 }
 
-/* Photo Edit Tabs */
+
 .photo-edit-tabs {
     display: flex;
     gap: 8px;
@@ -3329,7 +3329,7 @@ select:focus {
     display: block;
 }
 
-/* Preview Section */
+
 .photo-preview-wrapper {
     position: relative;
     display: inline-block;
@@ -3346,7 +3346,7 @@ select:focus {
     border-radius: var(--radius-md);
 }
 
-/* Crop Overlay */
+
 .crop-overlay {
     position: absolute;
     top: 0;
@@ -3400,7 +3400,7 @@ select:focus {
     cursor: se-resize;
 }
 
-/* Filter Buttons */
+
 .filter-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
@@ -3429,7 +3429,7 @@ select:focus {
     border-color: var(--sage);
 }
 
-/* Crop Controls */
+
 .crop-presets {
     display: flex;
     gap: 8px;
@@ -3458,7 +3458,7 @@ select:focus {
     text-align: center;
 }
 
-/* Resize Controls */
+
 .resize-presets {
     display: flex;
     flex-direction: column;
@@ -3483,7 +3483,7 @@ select:focus {
     background: var(--sage-light);
 }
 
-/* Upload Area */
+
 .upload-area {
     display: flex;
     flex-direction: column;
@@ -3536,7 +3536,7 @@ select:focus {
     display: none;
 }
 
-/* Preview Section */
+
 .photo-preview-section {
     display: flex;
     flex-direction: column;
@@ -3575,7 +3575,7 @@ select:focus {
     color: var(--ink-faint);
 }
 
-/* Controls Section */
+
 .photo-controls-section {
     display: flex;
     flex-direction: column;
@@ -3606,7 +3606,7 @@ select:focus {
     color: var(--sage-dark);
 }
 
-/* Slider Input */
+
 .photo-slider {
     width: 100%;
     height: 6px;
@@ -3650,7 +3650,7 @@ select:focus {
     box-shadow: 0 4px 12px rgba(122, 158, 126, 0.4);
 }
 
-/* Buttons Section */
+
 .photo-edit-buttons {
     display: flex;
     gap: 12px;
@@ -3702,7 +3702,7 @@ select:focus {
     border-color: var(--ink-faint);
 }
 
-/* Loading State */
+
 .photo-edit-loading {
     display: none;
     align-items: center;
@@ -3726,7 +3726,7 @@ select:focus {
     animation: spin 0.8s linear infinite;
 }
 
-/* Success State */
+
 .photo-edit-success {
     display: none;
     align-items: center;
@@ -3748,7 +3748,7 @@ select:focus {
     font-size: 18px;
 }
 
-/* Error State */
+
 .photo-edit-error {
     display: none;
     align-items: center;
@@ -3998,7 +3998,7 @@ select:focus {
     margin-top: 12px;
 }
 
-/* Subscription manager responsive */
+
 @media (max-width: 900px) {
     .subscriptions-section {
         padding: 22px;
@@ -4182,7 +4182,7 @@ select:focus {
     margin-top: 2px;
 }
 
-/* Crop Tools */
+
 .crop-tools {
     display: flex;
     flex-direction: column;
@@ -4237,7 +4237,7 @@ select:focus {
     color: #fff;
 }
 
-/* Filter Buttons */
+
 .filter-buttons {
     display: flex;
     gap: 8px;
@@ -4295,7 +4295,7 @@ select:focus {
     width: 95%;
     max-width: 440px;
     height: 640px;
-    /* Strong fixed height for layout stability */
+
     max-height: 95vh;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
@@ -4343,9 +4343,9 @@ select:focus {
     display: flex;
     flex-direction: column;
     flex: 1;
-    /* Grow to fill space but push buttons to bottom */
+
     overflow-y: auto;
-    /* Only allow content to scroll if needed */
+
     width: 100%;
 }
 
@@ -4365,7 +4365,7 @@ select:focus {
 
 .photo-preview-container {
     width: 200px;
-    /* Slightly larger to look better */
+
     height: 200px;
     margin: 0 auto;
     position: relative;
@@ -4391,19 +4391,19 @@ select:focus {
     height: 100%;
     object-fit: cover;
     transform: translate(-50%, -50%);
-    /* Initial centering */
+
     transform-origin: center;
     user-select: none;
     pointer-events: none;
     display: block;
 }
 
-/* REMOVE TOP RIGHT AVATAR */
+
 .profile-trigger-avatar {
     display: none !important;
 }
 
-/* SIDEBAR AVATAR WITH MULTI-COLOR BOUNDARY */
+
 .sidebar-user .user-avatar {
     position: relative;
     box-sizing: border-box;
@@ -4429,7 +4429,7 @@ select:focus {
     }
 }
 
-/* Fixed circular frame mask */
+
 .photo-frame-curtain {
     position: absolute;
     inset: 0;
@@ -4657,7 +4657,7 @@ select:focus {
     }
 }
 
-/* Global responsive improvements */
+
 @media (max-width: 1100px) {
     .main-wrapper {
         margin-left: 0;
@@ -4773,7 +4773,7 @@ select:focus {
     }
 }
 
-/* Additional Photo Editor Styles */
+
 .photo-edit-wrapper {
     display: flex;
     justify-content: center;
@@ -4826,7 +4826,7 @@ select:focus {
     border-radius: 50%;
 }
 
-/* Delete Confirmation Modal */
+
 .delete-photo-overlay {
     position: fixed;
     inset: 0;
@@ -4880,7 +4880,7 @@ select:focus {
     opacity: 1;
 }
 
-/* --- SKELETON LOADING --- */
+
 body.loading-state .stat-amount,
 body.loading-state .stat-change,
 body.loading-state .tx-list,
@@ -4969,14 +4969,16 @@ body.loading-state #globalLoader {
 /* ============================================
    INVESTMENTS & DEBT TRACKING
    ============================================ */
-.investments-grid, .debt-grid {
+.investments-grid,
+.debt-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
-.investment-card, .debt-card {
+.investment-card,
+.debt-card {
     background: var(--card-bg);
     border-radius: var(--radius);
     padding: 24px;
@@ -4988,25 +4990,29 @@ body.loading-state #globalLoader {
     transition: transform var(--transition), box-shadow var(--transition);
 }
 
-.investment-card:hover, .debt-card:hover {
+.investment-card:hover,
+.debt-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
 }
 
-.asset-header, .debt-header {
+.asset-header,
+.debt-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
 }
 
-.asset-info h4, .debt-info h4 {
+.asset-info h4,
+.debt-info h4 {
     font-size: 18px;
     font-weight: 700;
     color: var(--ink);
     margin-bottom: 4px;
 }
 
-.asset-category, .debt-lender {
+.asset-category,
+.debt-lender {
     font-size: 12px;
     color: var(--ink-faint);
     text-transform: uppercase;
@@ -5021,11 +5027,23 @@ body.loading-state #globalLoader {
     text-transform: uppercase;
 }
 
-.badge-stock { background: rgba(122, 158, 126, 0.15); color: var(--sage-dark); }
-.badge-crypto { background: rgba(201, 168, 76, 0.15); color: var(--gold); }
-.badge-mutual { background: rgba(160, 156, 200, 0.15); color: #6a66a0; }
+.badge-stock {
+    background: rgba(122, 158, 126, 0.15);
+    color: var(--sage-dark);
+}
 
-.asset-values, .debt-values {
+.badge-crypto {
+    background: rgba(201, 168, 76, 0.15);
+    color: var(--gold);
+}
+
+.badge-mutual {
+    background: rgba(160, 156, 200, 0.15);
+    color: #6a66a0;
+}
+
+.asset-values,
+.debt-values {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
@@ -5051,8 +5069,13 @@ body.loading-state #globalLoader {
     gap: 4px;
 }
 
-.text-profit { color: var(--sage-dark); }
-.text-loss { color: var(--coral); }
+.text-profit {
+    color: var(--sage-dark);
+}
+
+.text-loss {
+    color: var(--coral);
+}
 
 .debt-progress-container {
     margin-top: 8px;
@@ -5081,7 +5104,8 @@ body.loading-state #globalLoader {
     margin-top: 4px;
 }
 
-.investment-actions, .debt-actions {
+.investment-actions,
+.debt-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;

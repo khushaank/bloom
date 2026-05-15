@@ -7,7 +7,7 @@
     content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Canonical URL -->
+
   <link rel="canonical" href="https://khushaank.github.io/bloom/finance-tool.html">
 
   <title>Bloom — Your Financial Dashboard | Personal Finance Tracker</title>
@@ -19,7 +19,7 @@
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <meta name="theme-color" content="#4d7a52">
 
-  <!-- Additional SEO Meta Tags -->
+
   <meta name="language" content="English">
   <meta name="geo.region" content="US">
   <meta name="geo.placename" content="United States">
@@ -28,7 +28,7 @@
   <meta name="distribution" content="Global">
   <meta name="revisit-after" content="7 days">
 
-  <!-- Open Graph / Social -->
+
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://khushaank.github.io/bloom/finance-tool.html">
   <meta property="og:title" content="Bloom — Your Financial Dashboard | Personal Finance Tracker">
@@ -41,7 +41,7 @@
   <meta property="og:site_name" content="Bloom">
   <meta property="og:locale" content="en_US">
 
-  <!-- Twitter -->
+
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bloom — Your Financial Dashboard">
   <meta name="twitter:description"
@@ -51,7 +51,7 @@
   <meta name="twitter:creator" content="@bloomfinance">
   <meta name="twitter:site" content="@bloomfinance">
 
-  <!-- Structured Data / JSON-LD for SEO -->
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -107,7 +107,7 @@
   }
   </script>
 
-  <!-- Security Headers -->
+
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -138,13 +138,13 @@
     })();
   </script>
 
-  <!-- GLOBAL INITIAL LOADER -->
+
   <div id="globalLoader" class="global-loader">
     <div class="loader-spinner"></div>
     <div class="loader-text">Loading Bloom...</div>
   </div>
 
-  <!-- SIDEBAR -->
+
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-top">
       <div class="sidebar-header">
@@ -246,7 +246,7 @@
     </div>
   </aside>
 
-  <!-- MOBILE HEADER -->
+
   <div class="mobile-header" id="mobileHeader">
     <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
       <span></span><span></span><span></span>
@@ -268,10 +268,10 @@
     </button>
   </div>
 
-  <!-- OVERLAY for mobile sidebar -->
+
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-  <!-- MAIN CONTENT -->
+
   <div class="main-wrapper">
 
     <div class="top-bar">
@@ -321,9 +321,9 @@
       </div>
     </div>
 
-    <!-- DASHBOARD SECTION -->
+
     <section class="section-page active" id="section-dashboard">
-      <!-- GREETING -->
+
       <div class="greeting-row">
         <div class="greeting-text">
           <span class="greeting-label" id="greetingLabel">Good Morning, Julian</span>
@@ -336,7 +336,7 @@
         </div>
       </div>
 
-      <!-- MONTH NAV -->
+
       <div class="month-nav-bar">
         <button class="month-arrow" id="prevMonth" title="Previous Month">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -353,7 +353,7 @@
         <button class="btn-today" onclick="jumpToCurrent()">Today</button>
       </div>
 
-      <!-- SUMMARY CARDS -->
+
       <div class="summary-grid">
         <div class="summary-card card-balance" id="cardBalance">
           <div class="card-head">
@@ -420,9 +420,9 @@
         </div>
       </div>
 
-      <!-- CHARTS ROW -->
+
       <div class="charts-row">
-        <!-- MONTHLY SPENDING OVERVIEW (Area Chart) -->
+
         <div class="chart-card spending-chart-card">
           <div class="chart-card-header">
             <h2 class="card-title">Monthly Spending Overview</h2>
@@ -447,7 +447,7 @@
           </div>
         </div>
 
-        <!-- CATEGORICAL BREAKDOWN (Donut Chart) -->
+
         <div class="chart-card donut-chart-card">
           <h2 class="card-title">Categorical Breakdown</h2>
           <div class="donut-wrapper">
@@ -471,7 +471,7 @@
       </div>
 
       <div class="bottom-row">
-        <!-- RECENT TRANSACTIONS -->
+
         <div class="transactions-card">
           <div class="transactions-header">
             <h2 class="card-title" style="margin-bottom:0">Recent Transactions</h2>
@@ -487,14 +487,14 @@
           <div class="tx-list" id="txList"></div>
         </div>
 
-        <!-- SPENDING HEATMAP -->
+
         <div class="heatmap-card">
           <div id="spendingHeatmap"></div>
         </div>
       </div>
     </section>
 
-    <!-- TRANSACTIONS SECTION (full page) -->
+
     <section class="section-page" id="section-transactions">
       <div class="greeting-row">
         <div class="greeting-text">
@@ -541,7 +541,7 @@
         style="color:#2d7660; text-decoration:underline;">khushaankgupta@gmail.com</a>.
     </div>
 
-    <!-- SUBSCRIPTIONS SECTION -->
+
     <section class="section-page" id="section-subscriptions">
       <div class="greeting-row">
         <div class="greeting-text">
@@ -554,11 +554,11 @@
       </div>
 
       <div class="subscriptions-grid" id="subscriptionsGrid">
-        <!-- Subscriptions will be populated here -->
+
       </div>
     </section>
 
-    <!-- BUDGETING SECTION -->
+
     <section class="section-page" id="section-budgeting">
       <div class="greeting-row">
         <div class="greeting-text">
@@ -603,7 +603,7 @@
       </div>
     </section>
 
-    <!-- INVESTMENTS SECTION -->
+
     <section class="section-page" id="section-investments">
       <div class="greeting-row">
         <div class="greeting-text">
@@ -621,7 +621,7 @@
       </div>
     </section>
 
-    <!-- DEBT SECTION -->
+
     <section class="section-page" id="section-debt">
       <div class="greeting-row">
         <div class="greeting-text">
@@ -640,7 +640,7 @@
     </section>
 
 
-    <!-- SETTINGS SECTION -->
+
     <section class="section-page" id="section-settings">
       <div class="greeting-row">
         <div class="greeting-text">
@@ -689,7 +689,7 @@
           </div>
         </div>
 
-        <!-- ACCOUNT PROFILE CARD - MOVED TO FRONT -->
+
         <div class="settings-card account-card">
           <h2 class="card-title">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -700,7 +700,7 @@
             Account Profile
           </h2>
 
-          <!-- Avatar and Quick Info -->
+
           <div class="account-header">
             <div class="avatar-wrapper" style="position: relative;">
               <div id="settingsProfilePicture" class="user-avatar profile-picture-preview large">U</div>
@@ -731,7 +731,7 @@
             </div>
           </div>
 
-          <!-- Name Editor -->
+
           <div class="form-group modal-form-group" style="margin-top: 20px;">
             <label class="modal-label" for="settingsName">Display Name</label>
             <input type="text" class="modal-input" id="settingsName" placeholder="Your name" maxlength="30">
@@ -810,10 +810,10 @@
     </section>
   </div>
 
-  <!-- MODALS -->
+
   <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
 
-    <!-- Add Transaction Modal -->
+
     <div id="addTxModal" class="modal">
       <div class="modal-header">
         <h2 class="card-title" style="margin:0">Add Transaction</h2>
@@ -860,7 +860,7 @@
       </div>
     </div>
 
-    <!-- Report Modal -->
+
     <div id="reportModal" class="modal">
       <div class="modal-header">
         <h2 class="card-title" style="margin:0">Monthly Report</h2>
@@ -881,7 +881,7 @@
       <div id="repTop5"></div>
     </div>
 
-    <!-- Year View Modal -->
+
     <div id="yearModal" class="modal" style="max-width: 700px;">
       <div class="modal-header">
         <h2 class="card-title" style="margin:0">Yearly Overview <span id="yearViewTitle"></span></h2>
@@ -912,7 +912,7 @@
       <div class="year-chart-container" id="yearChart"></div>
     </div>
 
-    <!-- Budget Modal -->
+
     <div id="budgetModal" class="modal">
       <div class="modal-header">
         <h2 class="card-title" style="margin:0">Set Monthly Budget</h2>
@@ -927,7 +927,7 @@
       <button class="btn-primary full-width" onclick="saveBudget()">Save Budget</button>
     </div>
 
-    <!-- Calendar Modal -->
+
     <div id="calendarModal" class="modal" style="max-width: 620px;">
       <div class="modal-header">
         <h2 class="card-title" style="margin:0" id="calendarTitle"></h2>
@@ -966,7 +966,7 @@
     <button class="toast-close" id="toastClose">✕</button>
   </div>
 
-  <!-- DELETE PHOTO MODAL -->
+
   <div id="deletePhotoOverlay" class="delete-photo-overlay">
     <div class="delete-photo-container">
       <div class="delete-photo-icon">⚠</div>
@@ -981,7 +981,7 @@
     </div>
   </div>
 
-  <!-- PHOTO EDIT OVERLAY -->
+
   <div id="photoEditOverlay" class="photo-edit-overlay">
     <div class="photo-edit-container">
       <div class="photo-edit-header">
@@ -990,11 +990,11 @@
       </div>
 
       <div class="photo-edit-content">
-        <!-- Hidden file input for upload via menu -->
+
         <input type="file" id="photoUploadInput" class="upload-input" accept="image/*" style="display:none"
           onchange="handleProfilePictureUpload(event)" aria-label="Upload photo for editing">
 
-        <!-- Preview Section -->
+
         <div class="photo-preview-section" id="previewSection" style="display: none;">
           <p class="photo-preview-label">Fine-tune your profile photo</p>
           <div class="photo-preview-container">
@@ -1005,7 +1005,7 @@
           </div>
         </div>
 
-        <!-- Controls Section -->
+
         <div class="photo-controls-section" id="controlsSection" style="display: none;">
           <div class="form-group" style="margin-bottom:16px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
@@ -1037,7 +1037,7 @@
           </div>
         </div>
 
-        <!-- Status Messages -->
+
         <div class="photo-edit-loading" id="loadingState">
           <div class="edit-spinner"></div>
           <span>Processing image...</span>
@@ -1054,7 +1054,7 @@
         </div>
       </div>
 
-      <!-- Action Buttons (Moved outside content) -->
+
       <div class="photo-edit-buttons" id="actionButtons" style="display: none;">
         <button class="photo-edit-btn photo-edit-btn-cancel" onclick="resetPhotoEditor()">Cancel</button>
         <button class="photo-edit-btn photo-edit-btn-save" id="savePhotoBtn" onclick="savePhotoEdit()">Save
@@ -1063,7 +1063,7 @@
     </div>
   </div>
 
-  <!-- Subscription Modal -->
+
   <div id="subscriptionModal" class="modal">
     <div class="modal-header">
       <h2 class="card-title" style="margin:0;">Add Recurring Transaction</h2>
@@ -1126,7 +1126,7 @@
     </div>
   </div>
 
-  <!-- Investment Modal -->
+
   <div id="investmentModal" class="modal">
     <div class="modal-header">
       <h2 class="card-title" style="margin:0;">Add Investment</h2>
@@ -1166,7 +1166,7 @@
     </div>
   </div>
 
-  <!-- Debt Modal -->
+
   <div id="debtModal" class="modal">
     <div class="modal-header">
       <h2 class="card-title" style="margin:0;">Add Debt/Loan</h2>

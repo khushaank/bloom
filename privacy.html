@@ -5,14 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bloom — Privacy Policy | Data Privacy & Protection</title>
-  <meta name="description" content="Bloom Personal Finance Tracker privacy policy. Learn how we protect your financial data and respect your privacy.">
+  <meta name="description"
+    content="Bloom Personal Finance Tracker privacy policy. Learn how we protect your financial data and respect your privacy.">
   <meta name="keywords" content="privacy policy, data protection, personal finance privacy, GDPR, data security">
   <meta name="author" content="Bloom Digital Conservatory">
   <meta name="theme-color" content="#4d7a52">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
   <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
   <style>
@@ -28,7 +31,7 @@
       --card-bg: #ffffff;
     }
 
-    /* Dark Mode Color Scheme */
+
     html.dark-mode {
       --cream: #1a1a1e;
       --warm-white: #2a2a30;
@@ -38,7 +41,7 @@
       --ink-faint: #686870;
     }
 
-    /* Explicit Light Mode */
+
     html.light-mode {
       --cream: #f4f1ec;
       --warm-white: #faf8f5;
@@ -48,7 +51,11 @@
       --ink-faint: #b8ad9e;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -72,14 +79,16 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255, 255, 255, 0.6);
       text-decoration: none;
       font-size: 14px;
       margin-bottom: 24px;
       transition: color 0.2s;
     }
 
-    .policy-back:hover { color: #fff; }
+    .policy-back:hover {
+      color: #fff;
+    }
 
     .policy-header h1 {
       font-family: 'Playfair Display', serif;
@@ -90,7 +99,7 @@
     }
 
     .policy-header p {
-      color: rgba(255,255,255,0.5);
+      color: rgba(255, 255, 255, 0.5);
       font-size: 14px;
     }
 
@@ -107,10 +116,12 @@
       color: var(--ink);
       margin: 36px 0 16px;
       padding-bottom: 8px;
-      border-bottom: 1px solid rgba(44,36,22,0.08);
+      border-bottom: 1px solid rgba(44, 36, 22, 0.08);
     }
 
-    .policy-content h2:first-child { margin-top: 0; }
+    .policy-content h2:first-child {
+      margin-top: 0;
+    }
 
     .policy-content p {
       font-size: 15px;
@@ -140,13 +151,21 @@
       padding: 24px 32px;
       font-size: 12px;
       color: var(--ink-faint);
-      border-top: 1px solid rgba(44,36,22,0.06);
+      border-top: 1px solid rgba(44, 36, 22, 0.06);
     }
 
     @media (max-width: 600px) {
-      .policy-header { padding: 32px 20px; }
-      .policy-header h1 { font-size: 28px; }
-      .policy-content { padding: 32px 20px 60px; }
+      .policy-header {
+        padding: 32px 20px;
+      }
+
+      .policy-header h1 {
+        font-size: 28px;
+      }
+
+      .policy-content {
+        padding: 32px 20px 60px;
+      }
     }
   </style>
 </head>
@@ -154,7 +173,7 @@
 <body>
   <script>
     // Apply theme immediately to prevent flash
-    (function() {
+    (function () {
       const theme = sessionStorage.getItem('bloom_theme') || 'system';
       const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
       if (isDark) {
@@ -169,7 +188,9 @@
   <div class="policy-header">
     <div class="policy-header-inner">
       <a href="login.html" class="policy-back">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
         Back
       </a>
       <h1>Privacy Policy</h1>
@@ -179,14 +200,18 @@
 
   <div class="policy-content">
     <h2>Introduction</h2>
-    <p>Bloom ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our personal finance tracking application.</p>
+    <p>Bloom ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we
+      collect, use, disclose, and safeguard your information when you use our personal finance tracking application.</p>
 
     <h2>Information We Collect</h2>
     <p>We collect information you provide directly when using Bloom:</p>
     <ul>
-      <li><strong>Account Information:</strong> Your email address, display name, and password when you create an account.</li>
-      <li><strong>Financial Data:</strong> Transaction records, budget settings, and savings goals you enter into the application.</li>
-      <li><strong>Usage Data:</strong> Information about how you interact with the application, including features used and session duration.</li>
+      <li><strong>Account Information:</strong> Your email address, display name, and password when you create an
+        account.</li>
+      <li><strong>Financial Data:</strong> Transaction records, budget settings, and savings goals you enter into the
+        application.</li>
+      <li><strong>Usage Data:</strong> Information about how you interact with the application, including features used
+        and session duration.</li>
     </ul>
 
     <h2>How We Use Your Information</h2>
@@ -200,11 +225,15 @@
     </ul>
 
     <h2>Data Storage and Security</h2>
-    <p>Your data is stored securely using industry-standard encryption and hosted on Supabase infrastructure. We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
-    <p>All data transmissions are encrypted using TLS/SSL protocols. Passwords are hashed and never stored in plain text.</p>
+    <p>Your data is stored securely using industry-standard encryption and hosted on Supabase infrastructure. We
+      implement appropriate technical and organizational measures to protect your personal information against
+      unauthorized access, alteration, disclosure, or destruction.</p>
+    <p>All data transmissions are encrypted using TLS/SSL protocols. Passwords are hashed and never stored in plain
+      text.</p>
 
     <h2>Data Sharing</h2>
-    <p>We do not sell, trade, or otherwise transfer your personal information to third parties. Your financial data is private and accessible only to you through your authenticated account.</p>
+    <p>We do not sell, trade, or otherwise transfer your personal information to third parties. Your financial data is
+      private and accessible only to you through your authenticated account.</p>
     <p>We may share information only in the following circumstances:</p>
     <ul>
       <li>When required by law or in response to valid legal processes</li>
@@ -223,16 +252,22 @@
     </ul>
 
     <h2>Cookies and Local Storage</h2>
-    <p>Bloom uses browser local storage and session tokens for authentication purposes. We do not use tracking cookies or third-party analytics tools. Authentication tokens are stored securely and expire automatically.</p>
+    <p>Bloom uses browser local storage and session tokens for authentication purposes. We do not use tracking cookies
+      or third-party analytics tools. Authentication tokens are stored securely and expire automatically.</p>
 
     <h2>Children's Privacy</h2>
-    <p>Bloom is not intended for use by individuals under the age of 13. We do not knowingly collect personal information from children. If we learn that we have collected data from a child under 13, we will take steps to delete that information promptly.</p>
+    <p>Bloom is not intended for use by individuals under the age of 13. We do not knowingly collect personal
+      information from children. If we learn that we have collected data from a child under 13, we will take steps to
+      delete that information promptly.</p>
 
     <h2>Changes to This Policy</h2>
-    <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the updated policy on this page with a revised "Last updated" date. Your continued use of Bloom after changes constitutes acceptance of the updated policy.</p>
+    <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the
+      updated policy on this page with a revised "Last updated" date. Your continued use of Bloom after changes
+      constitutes acceptance of the updated policy.</p>
 
     <h2>Contact Us</h2>
-    <p>If you have questions or concerns about this Privacy Policy or our data practices, please contact us at <strong>privacy@khushaank.github.io/bloom</strong>.</p>
+    <p>If you have questions or concerns about this Privacy Policy or our data practices, please contact us at
+      <strong>privacy@khushaank.github.io/bloom</strong>.</p>
   </div>
 
   <div class="policy-footer">

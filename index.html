@@ -3,21 +3,24 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Canonical URL -->
+
   <link rel="canonical" href="https://khushaank.github.io/bloom/">
 
-  <!-- SEO Meta Tags -->
+
   <title>Bloom | Master Your Wealth With Elegance - Personal Finance Tracker</title>
-  <meta name="description" content="Take control of your financial future. Track spending, set goals, and build wealth with Bloom's intelligent insights and beautiful dashboard designed for professionals. Free personal finance management.">
-  <meta name="keywords" content="personal finance tracker, budget app, expense tracker, financial planning, wealth management, money management, savings goals, financial dashboard, budget planner, expense management">
+  <meta name="description"
+    content="Take control of your financial future. Track spending, set goals, and build wealth with Bloom's intelligent insights and beautiful dashboard designed for professionals. Free personal finance management.">
+  <meta name="keywords"
+    content="personal finance tracker, budget app, expense tracker, financial planning, wealth management, money management, savings goals, financial dashboard, budget planner, expense management">
   <meta name="author" content="Bloom Digital Conservatory">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <meta name="theme-color" content="#4d7a52">
 
-  <!-- Additional SEO Meta Tags -->
+
   <meta name="language" content="English">
   <meta name="geo.region" content="US">
   <meta name="geo.placename" content="United States">
@@ -26,11 +29,12 @@
   <meta name="distribution" content="Global">
   <meta name="revisit-after" content="7 days">
 
-  <!-- Open Graph / Social -->
+
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://khushaank.github.io/bloom/">
   <meta property="og:title" content="Bloom | Master Your Wealth With Elegance - Personal Finance Tracker">
-  <meta property="og:description" content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard. Free personal finance management tool.">
+  <meta property="og:description"
+    content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard. Free personal finance management tool.">
   <meta property="og:image" content="https://khushaank.github.io/bloom/assets/images/logo.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -38,28 +42,31 @@
   <meta property="og:site_name" content="Bloom">
   <meta property="og:locale" content="en_US">
 
-  <!-- Twitter -->
+
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://khushaank.github.io/bloom/">
   <meta name="twitter:title" content="Bloom | Master Your Wealth With Elegance">
-  <meta name="twitter:description" content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard.">
+  <meta name="twitter:description"
+    content="Track spending, set goals, and build wealth with intelligent insights and a beautiful dashboard.">
   <meta name="twitter:image" content="https://khushaank.github.io/bloom/assets/images/logo.png">
   <meta name="twitter:image:alt" content="Bloom Personal Finance Tracker">
   <meta name="twitter:creator" content="@bloomfinance">
   <meta name="twitter:site" content="@bloomfinance">
 
-  <!-- Core Fonts and Styles -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="assets/css/landing.css">
   <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
 
-  <!-- Security Protocol & Supabase -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/security.js"></script>
   <script src="assets/js/supabase.js"></script>
   <script src="assets/js/landing.js" defer></script>
 
-  <!-- Structured Data / JSON-LD for SEO -->
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -149,14 +156,14 @@
 
 <body>
   <script>
-    (function() {
+    (function () {
       document.documentElement.classList.add('light-mode');
       document.documentElement.style.colorScheme = 'light';
       sessionStorage.setItem('bloom_theme', 'light');
     })();
   </script>
 
-  <!-- Navigation -->
+
   <nav class="landing-nav" id="landingNav">
     <a href="index.html" class="nav-brand">
       <div class="nav-brand-icon">
@@ -168,7 +175,7 @@
       </div>
     </a>
 
-    <!-- Mobile Menu Toggle -->
+
     <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu">
       <span></span><span></span><span></span>
     </button>
@@ -182,7 +189,7 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
+
   <section class="hero">
     <div class="hero-bg-glow"></div>
     <div class="hero-content">
@@ -191,24 +198,34 @@
         Free &amp; Open Source
       </div>
       <h1>Your money, <br><em>beautifully</em> managed.</h1>
-      <p class="hero-sub">Bloom is the personal finance tracker built for people who care about design, privacy, and clarity. Track income, expenses, budgets — all in one elegant dashboard.</p>
+      <p class="hero-sub">Bloom is the personal finance tracker built for people who care about design, privacy, and
+        clarity. Track income, expenses, budgets — all in one elegant dashboard.</p>
       <div class="hero-trust">
         <div class="trust-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
           <span>No credit card required</span>
         </div>
         <div class="trust-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
           <span>100% private</span>
         </div>
         <div class="trust-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
           <span>Free forever</span>
         </div>
       </div>
     </div>
 
-    <!-- Hero Image (full-width dashboard demo) -->
+
     <div class="hero-image-showcase">
       <div class="hero-image-frame">
         <div class="frame-bar">
@@ -216,13 +233,15 @@
           <span class="frame-url">khushaank.github.io/bloom/dashboard</span>
           <div class="frame-spacer"></div>
         </div>
-        <img src="assets/images/dashboard-preview.png" alt="Bloom Dashboard Preview — Income, expense, and budget tracking interface with charts, transaction history, and category breakdowns." width="1400" height="780" loading="eager">
+        <img src="assets/images/dashboard-preview.png"
+          alt="Bloom Dashboard Preview — Income, expense, and budget tracking interface with charts, transaction history, and category breakdowns."
+          width="1400" height="780" loading="eager">
       </div>
       <div class="hero-image-glow"></div>
     </div>
   </section>
 
-  <!-- Social Proof / Stats -->
+
   <section class="stats-bar">
     <div class="stats-container">
       <div class="stat-item">
@@ -247,7 +266,7 @@
     </div>
   </section>
 
-  <!-- Features Section -->
+
   <section class="features" id="features">
     <div class="section-head">
       <span class="section-tag">FEATURES</span>
@@ -258,7 +277,9 @@
     <div class="feature-grid">
       <div class="feature-card">
         <div class="feature-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
         </div>
         <h3>Real-time Tracking</h3>
         <p>Every income and expense—categorized and logged instantly. Always know where your money goes.</p>
@@ -266,7 +287,10 @@
 
       <div class="feature-card">
         <div class="feature-icon icon-blue">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path d="M2 10h20" />
+          </svg>
         </div>
         <h3>Smart Budgeting</h3>
         <p>Set monthly budgets and watch a live ring chart track your spending against your goals in real-time.</p>
@@ -274,7 +298,9 @@
 
       <div class="feature-card">
         <div class="feature-icon icon-amber">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+          </svg>
         </div>
         <h3>Multi-Currency</h3>
         <p>Switch between INR, USD, EUR, and GBP in a single click. Perfect for global professionals.</p>
@@ -282,7 +308,10 @@
 
       <div class="feature-card">
         <div class="feature-icon icon-rose">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0110 0v4" />
+          </svg>
         </div>
         <h3>Bank-Level Security</h3>
         <p>Encrypted transfers, Row Level Security on Supabase, and zero tracking cookies. Your data stays yours.</p>
@@ -290,7 +319,12 @@
 
       <div class="feature-card">
         <div class="feature-icon icon-violet">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
         </div>
         <h3>Subscription Manager</h3>
         <p>Track recurring payments and subscriptions. Never let a forgotten subscription drain your budget again.</p>
@@ -298,15 +332,19 @@
 
       <div class="feature-card">
         <div class="feature-icon icon-teal">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
         </div>
         <h3>Secure Storage</h3>
-        <p>Your data is stored securely and never sold. We prioritize your privacy at every step of your financial journey.</p>
+        <p>Your data is stored securely and never sold. We prioritize your privacy at every step of your financial
+          journey.</p>
       </div>
     </div>
   </section>
 
-  <!-- How It Works -->
+
   <section class="how-it-works">
     <div class="section-head">
       <span class="section-tag">HOW IT WORKS</span>
@@ -318,49 +356,69 @@
       <div class="step-card">
         <div class="step-number">01</div>
         <h3>Create an account</h3>
-        <p>Sign up free with your email and set up your profile in seconds. Your journey to financial clarity starts here.</p>
+        <p>Sign up free with your email and set up your profile in seconds. Your journey to financial clarity starts
+          here.</p>
       </div>
       <div class="step-connector">
-        <svg width="40" height="2" viewBox="0 0 40 2"><line x1="0" y1="1" x2="40" y2="1" stroke="#c9d5cb" stroke-width="2" stroke-dasharray="4 4"/></svg>
+        <svg width="40" height="2" viewBox="0 0 40 2">
+          <line x1="0" y1="1" x2="40" y2="1" stroke="#c9d5cb" stroke-width="2" stroke-dasharray="4 4" />
+        </svg>
       </div>
       <div class="step-card">
         <div class="step-number">02</div>
         <h3>Add transactions</h3>
-        <p>Log income and expenses with smart category suggestions. Add them one by one or import an entire backup at once.</p>
+        <p>Log income and expenses with smart category suggestions. Add them one by one or import an entire backup at
+          once.</p>
       </div>
       <div class="step-connector">
-        <svg width="40" height="2" viewBox="0 0 40 2"><line x1="0" y1="1" x2="40" y2="1" stroke="#c9d5cb" stroke-width="2" stroke-dasharray="4 4"/></svg>
+        <svg width="40" height="2" viewBox="0 0 40 2">
+          <line x1="0" y1="1" x2="40" y2="1" stroke="#c9d5cb" stroke-width="2" stroke-dasharray="4 4" />
+        </svg>
       </div>
       <div class="step-card">
         <div class="step-number">03</div>
         <h3>See insights</h3>
-        <p>Beautiful donut charts, spending heatmaps, monthly breakdowns, and PDF reports—clarity without the clutter.</p>
+        <p>Beautiful donut charts, spending heatmaps, monthly breakdowns, and PDF reports—clarity without the clutter.
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- Privacy Highlight -->
+
   <section class="privacy-section">
     <div class="privacy-inner">
       <div class="privacy-text">
         <span class="section-tag">100% PRIVATE</span>
         <h2 class="font-serif">Your finances are <em>nobody's</em> business.</h2>
-        <p>Bloom doesn't run ads. We don't sell data. We don't track you with analytics cookies. Your data is yours, period.</p>
+        <p>Bloom doesn't run ads. We don't sell data. We don't track you with analytics cookies. Your data is yours,
+          period.</p>
         <ul class="privacy-list">
           <li>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
             No third-party trackers or analytics
           </li>
           <li>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
             No ad networks or data brokers
           </li>
           <li>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
             Encrypted storage and secure access
           </li>
           <li>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
             Row Level Security on every database query
           </li>
         </ul>
@@ -369,19 +427,20 @@
       <div class="privacy-visual">
         <div class="shield-icon">
           <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4d7a52" stroke-width="1.2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <path d="M9 12l2 2 4-4" stroke-width="1.8"/>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <path d="M9 12l2 2 4-4" stroke-width="1.8" />
           </svg>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Testimonial / Quote -->
+
   <section class="testimonial-section">
     <div class="testimonial-inner">
       <blockquote>
-        <p class="font-serif">"Finally, a finance tool that looks like it was designed by someone who actually <em>cares</em> about design."</p>
+        <p class="font-serif">"Finally, a finance tool that looks like it was designed by someone who actually
+          <em>cares</em> about design."</p>
       </blockquote>
       <div class="testimonial-attr">
         <span class="attr-dash">—</span>
@@ -390,7 +449,7 @@
     </div>
   </section>
 
-  <!-- Final Section / Ready -->
+
   <section class="final-section">
     <div class="final-inner">
       <h2 class="font-serif">Start building better<br>financial habits today.</h2>
@@ -401,7 +460,7 @@
     </div>
   </section>
 
-  <!-- Footer -->
+
   <footer class="footer">
     <div class="footer-top">
       <div class="footer-brand">
