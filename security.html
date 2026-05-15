@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bloom Security | Advanced Financial Data Protection</title>
+  <meta name="description" content="Bloom uses enterprise-grade security: encryption, two-factor authentication, secure Supabase backend, and industry best practices to protect your financial data.">
+  <meta name="keywords" content="financial security, encryption, two-factor authentication, data protection, secure finance app">
+  <meta name="author" content="Bloom Digital Conservatory">
+  <meta name="theme-color" content="#4d7a52">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/landing.css">
+  <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/security.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/landing.js" defer></script>
+</head>
+<body>
+  <script>
+    // Apply theme immediately to prevent flash
+    (function() {
+      const theme = sessionStorage.getItem('bloom_theme') || 'system';
+      const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) {
+        document.documentElement.classList.add('dark-mode');
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.classList.add('light-mode');
+        document.documentElement.style.colorScheme = 'light';
+      }
+    })();
+  </script>
+  <nav class="landing-nav">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-brand-icon"><img src="assets/images/logo.png" alt="Bloom"></div>
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Bloom</span>
+        <span class="nav-brand-sub">DIGITAL CONSERVATORY</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="features.html" class="nav-link">Features</a>
+      <a href="security.html" class="nav-link" style="color:var(--sage-dark)">Security</a>
+      <a href="login.html" class="nav-btn">Get Started</a>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-top:160px; flex-direction:column; text-align:center;">
+    <h1 class="font-serif">Bank-grade Security Protocols</h1>
+    <p style="max-width:600px; margin:0 auto 40px;">Your financial data is yours. We implement rigorous safety measures to guarantee total peace of mind.</p>
+  </section>
+
+  <section class="features" style="background:var(--cream)">
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Row Level Security (RLS)</h3>
+        <p>Using Postgres Row Level Security, your data is cryptographically isolated from other users at the database level.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Google OAuth Protection</h3>
+        <p>SSO integration ensures your authentication uses Google's latest security infrastructure, preventing weak passwords.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Data Encryption</h3>
+        <p>All transmitted data is encrypted in transit and safely encrypted at rest inside our enterprise Supabase clusters.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-copy">&copy; 2026 Bloom Digital Conservatory.</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="login.html">Sign In</a>
+    </div>
+  </footer>
+</body>
+</html>

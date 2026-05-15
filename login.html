@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bloom — Sign In | Personal Finance Dashboard</title>
+  <meta name="description"
+    content="Sign in to your Bloom personal finance dashboard. Secure login to track expenses, manage budgets, and achieve your financial goals.">
+  <meta name="keywords"
+    content="personal finance login, budget login, money tracker sign in, secure finance app, Bloom login">
+  <meta name="author" content="Bloom Digital Conservatory">
+  <meta name="theme-color" content="#4d7a52">
+
+  <!-- Security Headers -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/login.css">
+  <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <script>
+    (function () {
+      document.documentElement.classList.add('light-mode');
+      document.documentElement.style.colorScheme = 'light';
+      sessionStorage.setItem('bloom_theme', 'light');
+    })();
+  </script>
+  <div class="login-page">
+    <!-- Left Panel: Branding -->
+    <div class="login-branding">
+      <div class="branding-content">
+        <div class="branding-logo">
+          <div class="branding-logo-icon">
+            <img src="assets/images/logo.png" alt="Bloom Logo">
+          </div>
+          <div class="branding-logo-text">
+            <span class="branding-name">Bloom</span>
+            <span class="branding-sub">DIGITAL CONSERVATORY</span>
+          </div>
+        </div>
+        <h1 class="branding-headline">Take control of your financial future</h1>
+        <p class="branding-desc">Track spending, set goals, and build wealth with intelligent insights and a beautiful
+          dashboard.</p>
+        <div class="branding-features">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <span>Real-time expense tracking</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+              </svg>
+            </div>
+            <span>Savings goals &amp; budgeting</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+            </div>
+            <span>Detailed reports &amp; analytics</span>
+          </div>
+        </div>
+      </div>
+      <div class="branding-footer">
+        <a href="privacy.html">Privacy Policy</a>
+        <span>Bloom &copy; 2026</span>
+      </div>
+    </div>
+
+    <!-- Right Panel: Auth Forms -->
+    <div class="login-form-panel">
+      <div class="form-container">
+        <!-- LOGIN FORM -->
+        <div id="loginView">
+          <h2 class="form-title">Welcome back</h2>
+          <p class="form-subtitle">Sign in to access your financial dashboard</p>
+
+          <div class="form-divider"><span>sign in with email</span></div>
+
+          <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="input-group">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <div class="input-group">
+              <label for="loginPassword">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="loginPassword" placeholder="Enter your password" required minlength="6"
+                  autocomplete="current-password">
+                <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path class="eye" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle class="pupil" cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="loginError" class="form-error"></div>
+            <button type="submit" class="submit-btn" id="loginBtn">
+              <span class="btn-text">Sign In</span>
+              <span class="btn-loading" style="display:none;">
+                <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none"
+                    stroke-dasharray="60 40" stroke-linecap="round" />
+                </svg>
+              </span>
+            </button>
+          </form>
+
+          <div class="form-divider"><span>or</span></div>
+
+          <p class="form-switch">
+            Don't have an account?
+            <button type="button" onclick="showSignup()">Create one</button>
+          </p>
+
+
+        </div>
+
+        <!-- SIGNUP FORM -->
+        <div id="signupView" style="display:none;">
+          <h2 class="form-title">Create your account</h2>
+          <p class="form-subtitle">Start your journey to financial freedom</p>
+
+          <div class="form-divider"><span>sign up with email</span></div>
+
+          <form id="signupForm" onsubmit="handleSignup(event)">
+            <div class="input-group">
+              <label for="signupName">Full Name <span style="color:#aaa;font-size:14px;">(optional)</span></label>
+              <input type="text" id="signupName" placeholder="Your name" maxlength="40" autocomplete="name">
+            </div>
+            <div class="input-group">
+              <label for="signupEmail">Email Address</label>
+              <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <div class="input-group">
+              <label for="signupPassword">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="signupPassword" placeholder="At least 6 characters" required minlength="6"
+                  autocomplete="new-password">
+                <button type="button" class="toggle-password" onclick="togglePassword('signupPassword')">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path class="eye" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle class="pupil" cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="signupError" class="form-error"></div>
+            <button type="submit" class="submit-btn" id="signupBtn">
+              <span class="btn-text">Create Account</span>
+              <span class="btn-loading" style="display:none;">
+                <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none"
+                    stroke-dasharray="60 40" stroke-linecap="round" />
+                </svg>
+              </span>
+            </button>
+          </form>
+
+          <div class="form-divider"><span>or</span></div>
+
+          <p class="form-switch">
+            Already have an account?
+            <button type="button" onclick="showLogin()">Sign in</button>
+          </p>
+
+
+        </div>
+
+        <!-- CONFIRMATION MESSAGE -->
+        <div id="confirmView" style="display:none;">
+          <div class="confirm-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--sage-dark)" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <h2 class="form-title">Check your email</h2>
+          <p class="form-subtitle">We sent a confirmation link to <strong id="confirmEmail"></strong>. Click the link to
+            activate your account.</p>
+          <button type="button" class="submit-btn" onclick="showLogin()" style="margin-top:24px;">Back to Sign
+            In</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/security.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/login.js"></script>
+</body>
+
+</html>

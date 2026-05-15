@@ -1,0 +1,626 @@
+/* ============================================
+   BLOOM — Login Page Styles
+   ============================================ */
+
+:root {
+    --cream: #f4f1ec;
+    --warm-white: #faf8f5;
+    --sage: #7a9e7e;
+    --sage-light: #a8c5ac;
+    --sage-dark: #4d7a52;
+    --sage-darker: #2d5a32;
+    --coral: #d4735a;
+    --ink: #2c2416;
+    --ink-light: #6b5e4e;
+    --ink-faint: #b8ad9e;
+    --card-bg: #ffffff;
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Color Scheme for Login */
+html.dark-mode {
+    --cream: #1a1a1e;
+    --warm-white: #2a2a30;
+    --card-bg: #2a2a30;
+    --ink: #e8e8ec;
+    --ink-light: #b0b0b8;
+    --ink-faint: #686870;
+}
+
+/* Explicit Light Mode for Login */
+html.light-mode {
+    --cream: #f4f1ec;
+    --warm-white: #faf8f5;
+    --card-bg: #ffffff;
+    --ink: #2c2416;
+    --ink-light: #6b5e4e;
+    --ink-faint: #b8ad9e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    background: var(--cream);
+}
+
+.login-page {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ---- LEFT BRANDING PANEL ---- */
+.login-branding {
+    flex: 1;
+    background: linear-gradient(160deg, var(--sage-darker) 0%, #1a3d1f 60%, #0f261a 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-branding::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(168, 197, 172, 0.08);
+}
+
+.login-branding::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(168, 197, 172, 0.05);
+}
+
+.branding-content {
+    position: relative;
+    z-index: 1;
+}
+
+.branding-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 64px;
+}
+
+.branding-logo-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.branding-logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.branding-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    font-style: italic;
+    display: block;
+    line-height: 1.1;
+}
+
+.branding-sub {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    display: block;
+}
+
+.branding-logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.branding-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 440px;
+}
+
+.branding-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+    max-width: 400px;
+    margin-bottom: 48px;
+}
+
+.branding-features {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sage-light);
+    flex-shrink: 0;
+}
+
+.branding-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+}
+
+.branding-footer a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: color var(--transition);
+}
+
+.branding-footer a:hover {
+    color: rgba(255,255,255,0.7);
+}
+
+/* ---- RIGHT FORM PANEL ---- */
+.login-form-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    background: var(--card-bg);
+}
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+}
+
+.form-subtitle {
+    font-size: 14px;
+    color: var(--ink-light);
+    margin-bottom: 32px;
+    line-height: 1.5;
+}
+
+/* OAuth Buttons */
+.oauth-section {
+    margin-bottom: 24px;
+}
+
+.oauth-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--card-bg);
+    border: 1.5px solid rgba(44, 36, 22, 0.12);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.oauth-btn:hover {
+    background: var(--warm-white);
+    border-color: var(--ink-faint);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44, 36, 22, 0.04);
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 44px; /* Space for the icon */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition);
+}
+
+.toggle-password:hover {
+    color: var(--sage-dark);
+}
+
+.toggle-password.visible .eye {
+    stroke-dasharray: 20;
+    stroke-dashoffset: 10;
+}
+
+.input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 8px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid rgba(44, 36, 22, 0.12);
+    border-radius: 12px;
+    background: var(--warm-white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: all var(--transition);
+}
+
+.input-group input::placeholder {
+    color: var(--ink-faint);
+}
+
+.input-group input:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(122, 158, 126, 0.12);
+}
+
+.form-error {
+    color: var(--coral);
+    font-size: 13px;
+    margin-bottom: 12px;
+    min-height: 20px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--sage-dark);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.submit-btn:hover {
+    background: var(--sage-darker);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(77, 122, 82, 0.3);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.spinner {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.form-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 28px 0;
+    color: var(--ink-faint);
+    font-size: 12px;
+}
+
+.form-divider::before,
+.form-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(44, 36, 22, 0.1);
+}
+
+.form-switch {
+    text-align: center;
+    font-size: 14px;
+    color: var(--ink-light);
+}
+
+.form-switch button {
+    background: none;
+    border: none;
+    color: var(--sage-dark);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    transition: color var(--transition);
+}
+
+.form-switch button:hover {
+    color: var(--sage-darker);
+}
+
+.confirm-icon {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+/* ---- OFFLINE MODE BUTTON ---- */
+.offline-mode-btn {
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 16px;
+    background: linear-gradient(135deg, #f0f1f3 0%, #fafbfc 100%);
+    color: var(--ink);
+    border: 1.5px solid rgba(122, 158, 126, 0.3);
+    border-radius: 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.offline-mode-btn:hover {
+    background: linear-gradient(135deg, #e8eaed 0%, #f0f1f3 100%);
+    border-color: var(--sage);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(122, 158, 126, 0.2);
+}
+
+.offline-mode-btn:active {
+    transform: translateY(0);
+}
+
+.offline-mode-btn svg {
+    width: 18px;
+    height: 18px;
+    color: var(--sage);
+}
+
+/* ---- FORM ENHANCEMENTS ---- */
+.form-divider {
+    margin: 24px 0 20px;
+    text-align: center;
+    position: relative;
+}
+
+.form-divider span {
+    background: var(--warm-white);
+    padding: 0 12px;
+    position: relative;
+    z-index: 2;
+    color: var(--ink-light);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(44, 36, 22, 0.08);
+    z-index: 1;
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    color: var(--ink-faint);
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-password:hover {
+    color: var(--ink);
+}
+
+.toggle-password.visible {
+    color: var(--sage);
+}
+
+.oauth-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: white;
+    color: var(--ink);
+    border: 1.5px solid rgba(44, 36, 22, 0.12);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.oauth-btn:hover {
+    background: var(--warm-white);
+    border-color: var(--ink-light);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(44, 36, 22, 0.08);
+}
+
+.form-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--ink);
+}
+
+.form-switch button {
+    background: none;
+    border: none;
+    color: var(--sage);
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+    text-decoration: underline;
+    transition: color var(--transition);
+}
+
+.form-switch button:hover {
+    color: var(--sage-dark);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 900px) {
+    .login-page {
+        flex-direction: column;
+    }
+
+    .login-branding {
+        padding: 24px;
+        min-height: auto;
+    }
+
+    .branding-headline {
+        font-size: 28px;
+    }
+
+    .branding-features, .branding-desc {
+        display: none;
+    }
+
+    .branding-footer {
+        display: none;
+    }
+
+    .login-form-panel {
+        padding: 32px 24px;
+        min-height: 100vh;
+        align-items: flex-start;
+    }
+
+    .offline-mode-btn {
+        padding: 11px 14px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-branding {
+        padding: 20px;
+    }
+
+    .branding-headline {
+        font-size: 22px;
+    }
+
+    .login-form-panel {
+        padding: 24px 16px;
+    }
+
+    .form-title {
+        font-size: 24px;
+    }
+}
+
+::selection {
+    background: var(--sage-light);
+    color: var(--ink);
+}

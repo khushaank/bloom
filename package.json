@@ -1,0 +1,33 @@
+{
+  "name": "bloom-finance",
+  "version": "1.0.0",
+  "description": "Bloom - A sophisticated personal finance tracker with privacy-first design",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Build process'",
+    "lint": "eslint assets/js --fix",
+    "test": "echo 'Test suite'"
+  },
+  "keywords": [
+    "finance",
+    "budget",
+    "tracker",
+    "money",
+    "wealth",
+    "privacy"
+  ],
+  "author": "Bloom Digital Conservatory",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+        "url": "https://github.com/khushaank/bloom.git"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  }
+}

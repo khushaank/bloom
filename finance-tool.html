@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.supabase.co data: blob:;">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://khushaank.github.io/bloom/finance-tool.html">
+
+  <title>Bloom — Your Financial Dashboard | Personal Finance Tracker</title>
+  <meta name="description"
+    content="Bloom Personal Finance Tracker — Track income, expenses, savings goals, and budgets with beautiful charts and insights. Master your finances with intelligent budgeting tools. Free forever.">
+  <meta name="keywords"
+    content="personal finance tracker, budget tracker, expense tracker, savings goals, money management, financial dashboard, wealth building, budget planner, expense management, financial planning">
+  <meta name="author" content="Bloom Digital Conservatory">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="theme-color" content="#4d7a52">
+
+  <!-- Additional SEO Meta Tags -->
+  <meta name="language" content="English">
+  <meta name="geo.region" content="US">
+  <meta name="geo.placename" content="United States">
+  <meta name="classification" content="Finance, Personal Finance, Budgeting">
+  <meta name="rating" content="General">
+  <meta name="distribution" content="Global">
+  <meta name="revisit-after" content="7 days">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://khushaank.github.io/bloom/finance-tool.html">
+  <meta property="og:title" content="Bloom — Your Financial Dashboard | Personal Finance Tracker">
+  <meta property="og:description"
+    content="Track spending, set goals, and build wealth with beautiful charts and insights. Free personal finance management tool.">
+  <meta property="og:image" content="https://khushaank.github.io/bloom/assets/images/logo.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bloom Financial Dashboard Screenshot">
+  <meta property="og:site_name" content="Bloom">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bloom — Your Financial Dashboard">
+  <meta name="twitter:description"
+    content="Track spending, set goals, and build wealth with beautiful charts and insights.">
+  <meta name="twitter:image" content="https://khushaank.github.io/bloom/assets/images/logo.png">
+  <meta name="twitter:image:alt" content="Bloom Personal Finance Dashboard">
+  <meta name="twitter:creator" content="@bloomfinance">
+  <meta name="twitter:site" content="@bloomfinance">
+
+  <!-- Structured Data / JSON-LD for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://khushaank.github.io/bloom/finance-tool.html#webapplication",
+        "name": "Bloom Personal Finance Dashboard",
+        "url": "https://khushaank.github.io/bloom/finance-tool.html",
+        "description": "Comprehensive personal finance management dashboard for tracking expenses, creating budgets, setting financial goals, and monitoring wealth building progress.",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "browserRequirements": "Modern web browser with JavaScript enabled",
+        "featureList": [
+          "Real-time expense tracking",
+          "Interactive budget creation",
+          "Financial goal setting and monitoring",
+          "Advanced analytics and reporting",
+          "Multi-currency support",
+          "Data export capabilities",
+          "Privacy-first design",
+          "Beautiful data visualizations"
+        ],
+        "screenshot": "https://khushaank.github.io/bloom/assets/images/logo.png",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bloom Digital Conservatory",
+          "url": "https://khushaank.github.io/bloom/"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://khushaank.github.io/bloom/finance-tool.html#webpage",
+        "url": "https://khushaank.github.io/bloom/finance-tool.html",
+        "name": "Bloom — Your Financial Dashboard | Personal Finance Tracker",
+        "description": "Access your personal finance dashboard to track spending, manage budgets, and monitor financial goals with beautiful charts and insights.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "Bloom",
+          "url": "https://khushaank.github.io/bloom/"
+        },
+        "datePublished": "2026-03-25",
+        "dateModified": "2026-03-25",
+        "inLanguage": "en-US"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Security Headers -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+
+<body class="loading-state">
+
+  <script>
+    // Apply theme immediately to prevent flash
+    (function () {
+      const theme = sessionStorage.getItem('bloom_theme') || 'dark';
+      const isDark = theme === 'dark';
+      if (isDark) {
+        document.documentElement.classList.add('dark-mode');
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.classList.add('light-mode');
+        document.documentElement.style.colorScheme = 'light';
+      }
+    })();
+  </script>
+
+  <!-- GLOBAL INITIAL LOADER -->
+  <div id="globalLoader" class="global-loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Loading Bloom...</div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="#4d7a52" />
+              <path d="M12 6c0 3.5-2.5 6-6 6 3.5 0 6 2.5 6 6 0-3.5 2.5-6 6-6-3.5 0-6-2.5-6-6z" fill="#a8c5ac" />
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-name">Bloom</span>
+            <span class="logo-sub">DIGITAL CONSERVATORY</span>
+          </div>
+        </div>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()"
+          title="Collapse sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active" data-section="dashboard"
+          onclick="switchSection('dashboard', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="#transactions" class="nav-item" data-section="transactions"
+          onclick="switchSection('transactions', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+          </svg>
+          <span>Transactions</span>
+        </a>
+        <a href="#subscriptions" class="nav-item" data-section="subscriptions"
+          onclick="switchSection('subscriptions', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span>Subscriptions</span>
+        </a>
+        <a href="#budgeting" class="nav-item" data-section="budgeting" onclick="switchSection('budgeting', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path d="M2 10h20" />
+          </svg>
+          <span>Budgeting</span>
+        </a>
+        <a href="#investments" class="nav-item" data-section="investments" onclick="switchSection('investments', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+            <polyline points="16 7 22 7 22 13" />
+          </svg>
+          <span>Investments</span>
+        </a>
+        <a href="#debt" class="nav-item" data-section="debt" onclick="switchSection('debt', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" transform="rotate(180 12 12)" />
+          </svg>
+          <span>Debt Tracking</span>
+        </a>
+        <a href="#settings" class="nav-item" data-section="settings" onclick="switchSection('settings', this)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <button class="nav-item logout-btn" onclick="handleLogout()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        <span>Sign Out</span>
+      </button>
+      <div class="sidebar-user">
+        <div class="user-avatar" id="userInitials">U</div>
+        <div class="user-info">
+          <span class="user-name" id="userName">User</span>
+          <span class="user-role">Member</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MOBILE HEADER -->
+  <div class="mobile-header" id="mobileHeader">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mobile-logo">
+      <div class="logo-icon-sm">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#4d7a52" />
+          <path d="M12 6c0 3.5-2.5 6-6 6 3.5 0 6 2.5 6 6 0-3.5 2.5-6 6-6-3.5 0-6-2.5-6-6z" fill="#a8c5ac" />
+        </svg>
+      </div>
+      <span>Bloom</span>
+    </div>
+    <button class="mobile-profile" onclick="toggleSidebar()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- OVERLAY for mobile sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+
+    <div class="top-bar">
+      <div class="top-bar-left"></div>
+      <div class="top-bar-actions">
+
+        <div class="profile-dropdown-wrapper">
+          <button class="profile-trigger icon-btn" onclick="toggleProfileDropdown()"
+            style="border:none; background:none; padding:0;">
+            <div class="profile-trigger-avatar" id="profileInitials">U</div>
+          </button>
+
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+              <strong id="profileDropdownName">User</strong>
+              <span id="profileDropdownEmail">user@email.com</span>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a class="profile-dropdown-item"
+              onclick="switchSection('settings', document.querySelector('[data-section=settings]')); toggleProfileDropdown();">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+              </svg>
+              Settings
+            </a>
+            <a class="profile-dropdown-item" href="privacy.html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0110 0v4" />
+              </svg>
+              Privacy Policy
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <a class="profile-dropdown-item logout" onclick="handleLogout()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Sign Out
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <section class="section-page active" id="section-dashboard">
+      <!-- GREETING -->
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label" id="greetingLabel">Good Morning, Julian</span>
+          <h1 class="page-title">Your Financial Conservatory</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-primary" onclick="openModal('addTxModal')">
+            + Add Transaction
+          </button>
+        </div>
+      </div>
+
+      <!-- MONTH NAV -->
+      <div class="month-nav-bar">
+        <button class="month-arrow" id="prevMonth" title="Previous Month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <select id="monthSelect" aria-label="Select month"></select>
+        <select id="yearSelect" aria-label="Select year"></select>
+        <button class="month-arrow" id="nextMonth" title="Next Month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+        <button class="btn-today" onclick="jumpToCurrent()">Today</button>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="summary-grid">
+        <div class="summary-card card-balance" id="cardBalance">
+          <div class="card-head">
+            <span class="card-label">NET BALANCE</span>
+            <div class="card-icon-badge balance-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M2 10h20" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-amount" id="netBalance">$0.00</div>
+          <div class="card-trend" id="balanceTrend">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+            <span id="balanceTrendText">+4.2% from last month</span>
+          </div>
+        </div>
+        <div class="summary-card card-income" id="cardIncome">
+          <div class="card-head">
+            <span class="card-label">TOTAL INCOME</span>
+            <div class="card-icon-badge income-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-amount" id="totalIncome">$0.00</div>
+          <div class="card-sub" id="incomeCount">0 transactions</div>
+        </div>
+        <div class="summary-card card-expenses" id="cardExpenses">
+          <div class="card-head">
+            <span class="card-label">TOTAL EXPENSES</span>
+            <div class="card-icon-badge expense-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-amount" id="totalExpenses">$0.00</div>
+          <div class="card-sub-row">
+            <span id="expenseCount">0 transactions</span>
+            <span id="budgetText" class="budget-label"></span>
+          </div>
+          <div class="budget-progress">
+            <div class="budget-bar" id="budgetBar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="summary-card card-savings" id="cardSavings">
+          <div class="card-head">
+            <span class="card-label">SAVINGS RATE</span>
+            <div class="card-icon-badge savings-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-amount" id="savingsRate">0%</div>
+          <div class="card-sub" id="savingsGoalText">Goal: 45%</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="charts-row">
+        <!-- MONTHLY SPENDING OVERVIEW (Area Chart) -->
+        <div class="chart-card spending-chart-card">
+          <div class="chart-card-header">
+            <h2 class="card-title">Monthly Spending Overview</h2>
+            <div class="chart-period-toggle">
+              <button class="period-btn" onclick="setChartPeriod(6, this)">6 MONTHS</button>
+              <button class="period-btn active" onclick="setChartPeriod(12, this)">1 YEAR</button>
+            </div>
+          </div>
+          <div class="area-chart-container" id="areaChart">
+            <canvas id="spendingCanvas" width="540" height="220"></canvas>
+          </div>
+          <div class="chart-stats-row">
+            <div class="chart-stat">
+              <span class="chart-stat-label">Peak Spending</span>
+              <div class="chart-stat-value" id="peakSpending">$0</div>
+              <span class="chart-stat-month" id="peakMonth">—</span>
+            </div>
+            <div class="chart-stat">
+              <span class="chart-stat-label">Average Monthly</span>
+              <div class="chart-stat-value" id="avgSpending">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORICAL BREAKDOWN (Donut Chart) -->
+        <div class="chart-card donut-chart-card">
+          <h2 class="card-title">Categorical Breakdown</h2>
+          <div class="donut-wrapper">
+            <div class="donut-container">
+              <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#f0ebe3" stroke-width="28" />
+                <g id="donutSegments"></g>
+              </svg>
+              <div class="donut-center">
+                <span class="donut-center-label">TOTAL</span>
+                <span class="donut-center-val" id="donutTotal">$0</span>
+              </div>
+            </div>
+          </div>
+          <div class="legend" id="chartLegend">
+            <div class="empty-state" style="padding:10px 0;">
+              <p style="font-size:13px">No expenses yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-row">
+        <!-- RECENT TRANSACTIONS -->
+        <div class="transactions-card">
+          <div class="transactions-header">
+            <h2 class="card-title" style="margin-bottom:0">Recent Transactions</h2>
+            <button class="link-btn"
+              onclick="switchSection('transactions', document.querySelector('[data-section=transactions]'))">View All
+              Activities</button>
+          </div>
+          <div class="filter-pills">
+            <button class="pill active" onclick="setFilter('all', this)">All</button>
+            <button class="pill" onclick="setFilter('income', this)">Income</button>
+            <button class="pill" onclick="setFilter('expense', this)">Expenses</button>
+          </div>
+          <div class="tx-list" id="txList"></div>
+        </div>
+
+        <!-- SPENDING HEATMAP -->
+        <div class="heatmap-card">
+          <div id="spendingHeatmap"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS SECTION (full page) -->
+    <section class="section-page" id="section-transactions">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">All Transactions</span>
+          <h1 class="page-title">Transaction History</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-secondary" onclick="exportPDF()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Export PDF
+          </button>
+          <button class="btn-primary" onclick="openModal('addTxModal')">+ Add Transaction</button>
+        </div>
+      </div>
+      <div class="month-nav-bar">
+        <button class="month-arrow" onclick="prevM()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg></button>
+        <span id="txMonthLabel" class="month-label-text"></span>
+        <button class="month-arrow" onclick="nextM()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6" />
+          </svg></button>
+      </div>
+      <div class="transactions-card full-tx-card">
+        <div class="filter-pills" style="margin-bottom:16px">
+          <button class="pill active" onclick="setFilter('all', this)">All</button>
+          <button class="pill" onclick="setFilter('income', this)">Income</button>
+          <button class="pill" onclick="setFilter('expense', this)">Expenses</button>
+        </div>
+        <div class="tx-list" id="txListFull"></div>
+      </div>
+    </section>
+
+    <div class="version-cta"
+      style="padding: 16px 24px; margin: 16px auto; max-width: 960px; border: 1px solid rgba(44,36,22,0.14); border-radius: 16px; background: rgba(122,158,126,0.08); color: #2d5a32; font-size: 14px; line-height: 1.4;">
+      <strong>Bloom v1.0</strong>: this is the first major release. Version 2 will bring AI-powered insights, direct
+      bank connection syncing, smart predictive budgeting, and other futuristic features. Please share feedback or
+      report bugs to <a href="mailto:khushaankgupta@gmail.com"
+        style="color:#2d7660; text-decoration:underline;">khushaankgupta@gmail.com</a>.
+    </div>
+
+    <!-- SUBSCRIPTIONS SECTION -->
+    <section class="section-page" id="section-subscriptions">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Recurring Transactions</span>
+          <h1 class="page-title">Subscription Manager</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-primary" onclick="openSubscriptionModal()">+ Add Subscription</button>
+        </div>
+      </div>
+
+      <div class="subscriptions-grid" id="subscriptionsGrid">
+        <!-- Subscriptions will be populated here -->
+      </div>
+    </section>
+
+    <!-- BUDGETING SECTION -->
+    <section class="section-page" id="section-budgeting">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Budget Management</span>
+          <h1 class="page-title">Monthly Budgeting</h1>
+        </div>
+      </div>
+      <div class="budget-section-content">
+        <div class="budget-set-card">
+          <h2 class="card-title">Set Monthly Budget</h2>
+          <p style="color:var(--ink-light);margin-bottom:20px;font-size:14px;">Set a limit for your monthly expenses to
+            keep spending on track.</p>
+          <div class="form-group modal-form-group">
+            <label class="modal-label" for="budgetInputInline" id="budgetAmountLabel">Budget Amount (₹)</label>
+            <input type="number" class="modal-input" id="budgetInputInline" placeholder="e.g. 2000" min="0" step="10">
+          </div>
+          <button class="btn-primary" onclick="saveBudgetInline()">Save Budget</button>
+        </div>
+        <div class="budget-overview-card">
+          <h2 class="card-title">Budget Overview</h2>
+          <div class="budget-visual">
+            <div class="budget-ring-container">
+              <svg viewBox="0 0 120 120" class="budget-ring-svg">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#f0ebe3" stroke-width="12" />
+                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--sage)" stroke-width="12" id="budgetRing"
+                  stroke-dasharray="0 314" stroke-linecap="round" transform="rotate(-90 60 60)" />
+              </svg>
+              <div class="budget-ring-text">
+                <span class="budget-ring-pct" id="budgetPctText">0%</span>
+                <span class="budget-ring-label">USED</span>
+              </div>
+            </div>
+            <div class="budget-details">
+              <div class="budget-detail-row"><span>Budget</span><strong id="budgetAmountText">$0</strong></div>
+              <div class="budget-detail-row"><span>Spent</span><strong id="budgetSpentText"
+                  style="color:var(--coral)">$0</strong></div>
+              <div class="budget-detail-row"><span>Remaining</span><strong id="budgetRemainText"
+                  style="color:var(--sage-dark)">$0</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVESTMENTS SECTION -->
+    <section class="section-page" id="section-investments">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Portfolio Overview</span>
+          <h1 class="page-title">Investment Tracker</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-primary" onclick="openInvestmentModal()">+ Add Asset</button>
+        </div>
+      </div>
+      <div class="investments-grid" id="investmentsGrid">
+        <div class="empty-state">
+          <p>Start tracking your stocks, crypto, and mutual funds.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEBT SECTION -->
+    <section class="section-page" id="section-debt">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Liabilities Management</span>
+          <h1 class="page-title">Debt Tracker</h1>
+        </div>
+        <div class="greeting-actions">
+          <button class="btn-primary" onclick="openDebtModal()">+ Add Loan</button>
+        </div>
+      </div>
+      <div class="debt-grid" id="debtGrid">
+        <div class="empty-state">
+          <p>Manage your loans and repayment progress here.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SETTINGS SECTION -->
+    <section class="section-page" id="section-settings">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <span class="greeting-label">Preferences</span>
+          <h1 class="page-title">Settings</h1>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h2 class="card-title">Data Management</h2>
+          <div class="data-management-grid">
+            <button class="btn-secondary" onclick="backupData()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Backup Data
+            </button>
+            <button class="btn-secondary" onclick="document.getElementById('importFile').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Import Data
+            </button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"
+              aria-label="Import data file">
+            <button class="btn-secondary" onclick="exportCSV()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Export CSV
+            </button>
+            <button class="btn-secondary" onclick="exportHTMLReport()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+              Export PDF Report
+            </button>
+          </div>
+        </div>
+
+        <!-- ACCOUNT PROFILE CARD - MOVED TO FRONT -->
+        <div class="settings-card account-card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="display:inline; margin-right: 8px; vertical-align: middle;">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Account Profile
+          </h2>
+
+          <!-- Avatar and Quick Info -->
+          <div class="account-header">
+            <div class="avatar-wrapper" style="position: relative;">
+              <div id="settingsProfilePicture" class="user-avatar profile-picture-preview large">U</div>
+              <button id="editPhotoBtnTop" class="avatar-edit-btn" title="Change profile picture">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                </svg>
+              </button>
+              <div id="avatarMenu" class="avatar-menu" style="display:none;">
+                <button class="avatar-menu-btn"
+                  onclick="document.getElementById('profilePictureInput').click()">Upload</button>
+                <button class="avatar-menu-btn" onclick="openPhotoEditOverlay()">Edit</button>
+                <button class="avatar-menu-btn" onclick="openDeletePhotoModal()">Delete</button>
+              </div>
+              <input type="file" id="profilePictureInput" accept="image/*" style="display:none"
+                onchange="handleProfilePictureUpload(event)" aria-label="Upload profile picture">
+            </div>
+            <div class="account-header-info">
+              <div>
+                <p class="account-name-label">Display Name</p>
+                <h3 class="account-name" id="accountNameDisplay">User</h3>
+              </div>
+              <div>
+                <p class="account-email-label">Email</p>
+                <p class="account-email" id="settingsEmail">user@email.com</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Name Editor -->
+          <div class="form-group modal-form-group" style="margin-top: 20px;">
+            <label class="modal-label" for="settingsName">Display Name</label>
+            <input type="text" class="modal-input" id="settingsName" placeholder="Your name" maxlength="30">
+          </div>
+          <button class="btn-primary" id="saveNameBtn" style="display:none;" onclick="saveUserName()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="display:inline; margin-right: 6px; vertical-align: middle;">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Save Name
+          </button>
+
+          <div class="settings-footer" style="margin-top:16px; text-align:center;">
+            <a href="privacy.html"
+              style="color: var(--ink-light); font-size: 13px; text-decoration: underline;">Privacy</a>
+          </div>
+        </div>
+
+
+        <div class="settings-card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="display:inline; margin-right: 8px; vertical-align: middle;">
+              <circle cx="12" cy="12" r="1" />
+              <path
+                d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24" />
+            </svg>
+            Currency
+          </h2>
+          <div class="form-group modal-form-group">
+            <label class="modal-label" for="currencySelect">Display Currency</label>
+            <select class="modal-input" id="currencySelect" required>
+              <option value="INR">Indian Rupee (INR)</option>
+              <option value="USD">US Dollar (USD)</option>
+              <option value="EUR">Euro (EUR)</option>
+              <option value="GBP">British Pound (GBP)</option>
+            </select>
+          </div>
+          <button class="btn-primary" id="saveCurrencyBtn" style="display:none;" onclick="saveCurrency()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="display:inline; margin-right: 6px; vertical-align: middle;">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Save Currency
+          </button>
+        </div>
+        <div class="settings-card">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="display:inline; margin-right: 8px; vertical-align: middle;">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            Appearance
+          </h2>
+          <div class="form-group modal-form-group">
+            <label class="modal-label" for="themeSelect">Theme</label>
+            <select id="themeSelect" class="modal-input" required onchange="saveTheme()">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+
+    <!-- Add Transaction Modal -->
+    <div id="addTxModal" class="modal">
+      <div class="modal-header">
+        <h2 class="card-title" style="margin:0">Add Transaction</h2>
+        <button class="modal-close" onclick="closeModal(true)">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="type-toggle">
+          <button class="type-btn active-income" id="btnIncome" onclick="setType('income')">Income</button>
+          <button class="type-btn" id="btnExpense" onclick="setType('expense')">Expense</button>
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txName">Description</label>
+          <input type="text" class="modal-input" id="txName" placeholder="e.g. Coffee, Salary…" maxlength="40">
+          <div id="txNameSuggestions" class="suggestions-dropdown" style="display: none;"></div>
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txAmount" id="amountLabel">Amount (₹)</label>
+          <input type="number" class="modal-input" id="txAmount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txCategory">Category</label>
+          <select class="modal-input" id="txCategory">
+            <option value="Food & Drink">Food & Drink</option>
+            <option value="Transport">Transport</option>
+            <option value="Housing">Housing</option>
+            <option value="Health">Health</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Education">Education</option>
+            <option value="Salary">Salary</option>
+            <option value="Freelance">Freelance</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group modal-form-group">
+          <label class="modal-label" for="txDate">Date</label>
+          <input type="date" class="modal-input" id="txDate">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary full-width" onclick="addTransaction()" id="addTxBtn">Add Transaction</button>
+      </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+      <div class="modal-header">
+        <h2 class="card-title" style="margin:0">Monthly Report</h2>
+        <button class="modal-close" onclick="closeModal(true)">&times;</button>
+      </div>
+      <p style="color:var(--ink-faint); margin-bottom: 20px" id="repMonthLabel"></p>
+      <div class="modal-stat-row"><span>Total Income</span><strong id="repTotalInc"
+          style="color:var(--sage-dark)"></strong></div>
+      <div class="modal-stat-row"><span>Total Expenses</span><strong id="repTotalExp"
+          style="color:var(--coral)"></strong></div>
+      <div class="modal-stat-row"><span>Net Balance</span><strong id="repNetBal" style="color:var(--gold)"></strong>
+      </div>
+      <div class="modal-stat-row"><span>Savings Rate</span><strong id="repSavRate"></strong></div>
+      <div class="modal-stat-row"><span>Total Transactions</span><strong id="repTxCount"></strong></div>
+      <h3
+        style="margin: 24px 0 12px; font-size: 14px; text-transform: uppercase; color: var(--ink-faint); letter-spacing: 0.1em;">
+        Top 5 Expenses</h3>
+      <div id="repTop5"></div>
+    </div>
+
+    <!-- Year View Modal -->
+    <div id="yearModal" class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 class="card-title" style="margin:0">Yearly Overview <span id="yearViewTitle"></span></h2>
+        <button class="modal-close" onclick="closeModal(true)">&times;</button>
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+        <div class="mini-stat-card">
+          <div class="mini-stat-label">Income</div>
+          <div class="mini-stat-val" id="yvInc" style="color:var(--sage-dark)"></div>
+        </div>
+        <div class="mini-stat-card">
+          <div class="mini-stat-label">Expenses</div>
+          <div class="mini-stat-val" id="yvExp" style="color:var(--coral)"></div>
+        </div>
+        <div class="mini-stat-card">
+          <div class="mini-stat-label">Savings</div>
+          <div class="mini-stat-val" id="yvSav" style="color:var(--gold)"></div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:center; gap:20px; font-size:12px;">
+        <span style="display:flex; align-items:center; gap:6px;">
+          <div style="width:10px;height:10px;background:var(--sage-light);border-radius:2px;"></div> Income
+        </span>
+        <span style="display:flex; align-items:center; gap:6px;">
+          <div style="width:10px;height:10px;background:var(--coral);border-radius:2px;"></div> Expense
+        </span>
+      </div>
+      <div class="year-chart-container" id="yearChart"></div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div id="budgetModal" class="modal">
+      <div class="modal-header">
+        <h2 class="card-title" style="margin:0">Set Monthly Budget</h2>
+        <button class="modal-close" onclick="closeModal(true)">&times;</button>
+      </div>
+      <p style="color:var(--ink-light); margin-bottom: 20px; font-size:14px;">Set a limit for your monthly expenses to
+        keep your spending on track.</p>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="budgetInput" id="budgetAmountLabelModal">Budget Amount (₹)</label>
+        <input type="number" class="modal-input" id="budgetInput" placeholder="e.g. 2000" min="0" step="10">
+      </div>
+      <button class="btn-primary full-width" onclick="saveBudget()">Save Budget</button>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div id="calendarModal" class="modal" style="max-width: 620px;">
+      <div class="modal-header">
+        <h2 class="card-title" style="margin:0" id="calendarTitle"></h2>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="month-arrow" onclick="prevCalendarMonth()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button class="month-arrow" onclick="nextCalendarMonth()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+          <button class="modal-close" onclick="closeModal(true)">&times;</button>
+        </div>
+      </div>
+      <div class="calendar-header">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
+
+
+
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="toast-message" id="toastMessage"></span>
+    <button class="toast-close" id="toastClose">✕</button>
+  </div>
+
+  <!-- DELETE PHOTO MODAL -->
+  <div id="deletePhotoOverlay" class="delete-photo-overlay">
+    <div class="delete-photo-container">
+      <div class="delete-photo-icon">⚠</div>
+      <h3>Delete Profile Photo?</h3>
+      <p>This will remove your current profile picture and replace it with your initials. This action cannot be undone.
+      </p>
+      <div class="delete-photo-actions">
+        <button class="photo-edit-btn photo-edit-btn-cancel" onclick="closeDeletePhotoModal()">Cancel</button>
+        <button class="photo-edit-btn" style="background:#d4735a; color:white; border:none;"
+          onclick="confirmDeletePhoto()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHOTO EDIT OVERLAY -->
+  <div id="photoEditOverlay" class="photo-edit-overlay">
+    <div class="photo-edit-container">
+      <div class="photo-edit-header">
+        <h2>Edit Photo</h2>
+        <button class="photo-edit-close" onclick="closePhotoEditOverlay()">×</button>
+      </div>
+
+      <div class="photo-edit-content">
+        <!-- Hidden file input for upload via menu -->
+        <input type="file" id="photoUploadInput" class="upload-input" accept="image/*" style="display:none"
+          onchange="handleProfilePictureUpload(event)" aria-label="Upload photo for editing">
+
+        <!-- Preview Section -->
+        <div class="photo-preview-section" id="previewSection" style="display: none;">
+          <p class="photo-preview-label">Fine-tune your profile photo</p>
+          <div class="photo-preview-container">
+            <div class="photo-preview-wrapper" id="photoPreviewWrapper">
+              <img id="photoPreviewImage" class="photo-preview-image" alt="Preview">
+              <div class="photo-frame-curtain"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="photo-controls-section" id="controlsSection" style="display: none;">
+          <div class="form-group" style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <label class="crop-tool-label" for="zoomSlider">ZOOM</label>
+              <button class="btn-text-only" onclick="centerImage()"
+                style="font-size:11px; cursor:pointer; color:var(--sage-dark);">RE-CENTER</button>
+            </div>
+            <input type="range" id="zoomSlider" min="0.5" max="3" step="0.01" value="1" style="width:100%"
+              oninput="updateZoom(this.value)">
+          </div>
+
+          <div class="photo-edit-grid">
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <label class="crop-tool-label" for="brightnessSlider">Brightness</label>
+                <span id="brightnessValue" style="font-size:11px;">100%</span>
+              </div>
+              <input type="range" id="brightnessSlider" min="0" max="200" value="100" style="width:100%"
+                oninput="updateBrightness(this.value)">
+            </div>
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <label class="crop-tool-label" for="contrastSlider">Contrast</label>
+                <span id="contrastValue" style="font-size:11px;">100%</span>
+              </div>
+              <input type="range" id="contrastSlider" min="0" max="200" value="100" style="width:100%"
+                oninput="updateContrast(this.value)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="photo-edit-loading" id="loadingState">
+          <div class="edit-spinner"></div>
+          <span>Processing image...</span>
+        </div>
+
+        <div class="photo-edit-success" id="successState">
+          <span class="success-icon">✓</span>
+          <span>Photo saved successfully!</span>
+        </div>
+
+        <div class="photo-edit-error" id="errorState">
+          <span class="error-icon">⚠</span>
+          <span id="errorMessage">An error occurred. Please try again.</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons (Moved outside content) -->
+      <div class="photo-edit-buttons" id="actionButtons" style="display: none;">
+        <button class="photo-edit-btn photo-edit-btn-cancel" onclick="resetPhotoEditor()">Cancel</button>
+        <button class="photo-edit-btn photo-edit-btn-save" id="savePhotoBtn" onclick="savePhotoEdit()">Save
+          Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Modal -->
+  <div id="subscriptionModal" class="modal">
+    <div class="modal-header">
+      <h2 class="card-title" style="margin:0;">Add Recurring Transaction</h2>
+      <button class="modal-close" onclick="closeModal(true)">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="type-toggle">
+        <button class="type-btn active-income" id="subBtnIncome" onclick="setSubscriptionType('income')">Income</button>
+        <button class="type-btn" id="subBtnExpense" onclick="setSubscriptionType('expense')">Expense</button>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="subName">Description</label>
+        <input type="text" class="modal-input" id="subName" placeholder="e.g. Netflix, Rent, Salary…" maxlength="40">
+        <div id="subNameSuggestions" class="suggestions-dropdown" style="display: none;"></div>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="subAmount" id="subAmountLabel">Amount (₹)</label>
+        <input type="number" class="modal-input" id="subAmount" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="subCategory">Category</label>
+        <select class="modal-input" id="subCategory">
+          <option value="Food & Drink">Food & Drink</option>
+          <option value="Transport">Transport</option>
+          <option value="Housing">Housing</option>
+          <option value="Health">Health</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Education">Education</option>
+          <option value="Salary">Salary</option>
+          <option value="Freelance">Freelance</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="subFrequency">Frequency</label>
+        <select class="modal-input" id="subFrequency">
+          <option value="weekly">Weekly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="subStartDate">Start Date</label>
+        <input type="date" class="modal-input" id="subStartDate">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary full-width" onclick="addSubscription()" id="addSubBtn">
+        <span class="btn-text">Add Subscription</span>
+        <span class="btn-loading" style="display:none;">
+          <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="60 40"
+              stroke-linecap="round" />
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Investment Modal -->
+  <div id="investmentModal" class="modal">
+    <div class="modal-header">
+      <h2 class="card-title" style="margin:0;">Add Investment</h2>
+      <button class="modal-close" onclick="closeModal(true)">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="invName">Asset Name</label>
+        <input type="text" class="modal-input" id="invName" placeholder="e.g. Apple Inc, Bitcoin, Nifty 50…">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="invCategory">Category</label>
+        <select class="modal-input" id="invCategory">
+          <option value="Stock">Stock</option>
+          <option value="Crypto">Crypto</option>
+          <option value="Mutual Fund">Mutual Fund</option>
+          <option value="Gold">Gold</option>
+          <option value="Real Estate">Real Estate</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="invQuantity">Quantity</label>
+        <input type="number" class="modal-input" id="invQuantity" placeholder="0.00" step="0.0001">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="invAvgPrice">Avg Purchase Price (₹)</label>
+        <input type="number" class="modal-input" id="invAvgPrice" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="invCurrentPrice">Current Market Price (₹)</label>
+        <input type="number" class="modal-input" id="invCurrentPrice" placeholder="0.00" step="0.01">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary full-width" onclick="addInvestment()" id="addInvBtn">Add Investment</button>
+    </div>
+  </div>
+
+  <!-- Debt Modal -->
+  <div id="debtModal" class="modal">
+    <div class="modal-header">
+      <h2 class="card-title" style="margin:0;">Add Debt/Loan</h2>
+      <button class="modal-close" onclick="closeModal(true)">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="debtLender">Lender/Loan Name</label>
+        <input type="text" class="modal-input" id="debtLender" placeholder="e.g. HDFC Home Loan, Personal Loan…">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="debtTotal">Total Loan Amount (₹)</label>
+        <input type="number" class="modal-input" id="debtTotal" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="debtRemaining">Remaining Balance (₹)</label>
+        <input type="number" class="modal-input" id="debtRemaining" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="debtRate">Interest Rate (%)</label>
+        <input type="number" class="modal-input" id="debtRate" placeholder="e.g. 8.5" step="0.1">
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="modal-label" for="debtDue">Next Due Date</label>
+        <input type="date" class="modal-input" id="debtDue">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary full-width" onclick="addDebt()" id="addDebtBtn">Add Loan</button>
+    </div>
+  </div>
+
+  </div>
+
+  <script src="assets/js/security.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/script.js" defer></script>
+</body>
+
+</html>
